@@ -1,0 +1,8 @@
+CREATE TABLE profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  nickname TEXT UNIQUE NOT NULL,
+  avatar_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
