@@ -1,8 +1,23 @@
-import { Link } from 'react-router-dom'
+import { useState, KeyboardEvent } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
 export function Header() {
   const { user, profile, signOut } = useAuth()
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const [searchValue, setSearchValue] = useState(searchParams.get('search') ?? '')
+
+  function handleSearchKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      const trimmed = searchValue.trim()
+      if (trimmed) {
+        navigate(`/?search=${encodeURIComponent(trimmed)}`)
+      } else {
+        navigate('/')
+      }
+    }
+  }
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -14,6 +29,9 @@ export function Header() {
           <input
             type="text"
             placeholder="검색..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
             className="hidden lg:block border border-gray-200 rounded-lg px-4 py-2 text-sm w-48 outline-none focus:border-gray-400"
           />
           {user ? (

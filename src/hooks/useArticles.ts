@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import type { Article } from '../lib/types'
 import type { LeagueKey } from '../lib/constants'
 
-export function useArticles(league: LeagueKey, page: number = 1) {
+export function useArticles(league: LeagueKey, page: number = 1, search?: string) {
   const [articles, setArticles] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -24,6 +24,8 @@ export function useArticles(league: LeagueKey, page: number = 1) {
         query = query.eq('league', league)
       }
 
+      if (search) query = query.ilike('title', '%' + search + '%')
+
       const { data, error: fetchError } = await query
 
       if (fetchError) {
@@ -35,7 +37,7 @@ export function useArticles(league: LeagueKey, page: number = 1) {
     }
 
     fetchArticles()
-  }, [league, page])
+  }, [league, page, search])
 
   return { articles, loading, error }
 }

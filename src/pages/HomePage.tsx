@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { LeagueTabs } from '../components/LeagueTabs'
 import { NewsList } from '../components/NewsList'
 import { PopularCommentsSidebar } from '../components/PopularCommentsSidebar'
@@ -7,7 +8,9 @@ import type { LeagueKey } from '../lib/constants'
 
 export function HomePage() {
   const [league, setLeague] = useState<LeagueKey>('all')
-  const { articles, loading, error } = useArticles(league)
+  const [searchParams] = useSearchParams()
+  const search = searchParams.get('search') ?? undefined
+  const { articles, loading, error } = useArticles(league, 1, search)
 
   return (
     <div>
