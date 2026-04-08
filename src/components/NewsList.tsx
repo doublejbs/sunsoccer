@@ -1,4 +1,5 @@
 import { NewsCard } from './NewsCard'
+import { FeaturedCards } from './FeaturedCards'
 import type { Article } from '../lib/types'
 
 interface NewsListProps {
@@ -32,11 +33,19 @@ export function NewsList({ articles, loading, error }: NewsListProps) {
     )
   }
 
+  // Articles with images get featured treatment
+  const featured = articles.filter(a => a.image_url).slice(0, 2)
+  const featuredIds = new Set(featured.map(a => a.id))
+  const rest = articles.filter(a => !featuredIds.has(a.id))
+
   return (
-    <div className="px-4 lg:px-0">
-      {articles.map((article) => (
-        <NewsCard key={article.id} article={article} />
-      ))}
+    <div>
+      <FeaturedCards articles={featured} />
+      <div className="px-4 lg:px-0">
+        {rest.map((article) => (
+          <NewsCard key={article.id} article={article} />
+        ))}
+      </div>
     </div>
   )
 }
