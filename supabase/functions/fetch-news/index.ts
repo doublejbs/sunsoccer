@@ -44,7 +44,7 @@ function extractSource(link: string): string {
   catch { return '알 수 없음' }
 }
 
-async function extractOgMeta(url: string): Promise<{ image: string | null; title: string | null }> {
+async function extractOgMeta(url: string): Promise<{ image: string | null; title: string | null; description: string | null }> {
   try {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 3000)
@@ -53,18 +53,22 @@ async function extractOgMeta(url: string): Promise<{ image: string | null; title
       headers: { 'User-Agent': 'Mozilla/5.0' }
     })
     clearTimeout(timeout)
-    if (!res.ok) return { image: null, title: null }
+    if (!res.ok) return { image: null, title: null, description: null }
     const html = await res.text()
     const imageMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
       || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
     const titleMatch = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)
       || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i)
+    const descMatch = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i)
+      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i)
+    const decode = (s: string) => s.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     return {
       image: imageMatch ? imageMatch[1] : null,
-      title: titleMatch ? titleMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>') : null,
+      title: titleMatch ? decode(titleMatch[1]) : null,
+      description: descMatch ? decode(descMatch[1]) : null,
     }
   } catch {
-    return { image: null, title: null }
+    return { image: null, title: null, description: null }
   }
 }
 
@@ -81,7 +85,7 @@ serve(async (req) => {
         const { error } = await supabase.from('articles').upsert(
           {
             title: og.title || stripHtmlTags(item.title),
-            description: stripHtmlTags(item.description),
+            description: og.description || stripHtmlTags(item.description),
             source: extractSource(articleLink),
             link: articleLink,
             league,
