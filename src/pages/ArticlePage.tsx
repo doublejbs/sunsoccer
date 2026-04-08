@@ -17,6 +17,13 @@ export function ArticlePage() {
         <div className="text-sm text-gray-500 mb-3">
           {article.source} · <TimeAgo date={article.pub_date} />
         </div>
+        {article.image_url && (
+          <img
+            src={article.image_url}
+            alt=""
+            className="w-full rounded-lg mb-3 max-h-[400px] object-cover"
+          />
+        )}
         <p className="text-sm text-gray-700 leading-relaxed mb-3">{article.description}</p>
         <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-sm text-[#3b82f6] hover:underline">
           원문 기사 보기 →
