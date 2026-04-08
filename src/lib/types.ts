@@ -8,6 +8,7 @@ export interface Article {
   pub_date: string
   created_at: string
   comment_count: number
+  image_url: string | null
 }
 
 export interface Comment {

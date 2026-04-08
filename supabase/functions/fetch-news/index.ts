@@ -44,6 +44,25 @@ function extractSource(link: string): string {
   catch { return '알 수 없음' }
 }
 
+async function extractOgImage(url: string): Promise<string | null> {
+  try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 3000)
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'Mozilla/5.0' }
+    })
+    clearTimeout(timeout)
+    if (!res.ok) return null
+    const html = await res.text()
+    const match = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
+    return match ? match[1] : null
+  } catch {
+    return null
+  }
+}
+
 serve(async (req) => {
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
@@ -53,6 +72,7 @@ serve(async (req) => {
       const items = await fetchNaverNews(query)
       for (const item of items) {
         const articleLink = item.originallink || item.link
+        const imageUrl = await extractOgImage(articleLink)
         const { error } = await supabase.from('articles').upsert(
           {
             title: stripHtmlTags(item.title),
@@ -61,8 +81,9 @@ serve(async (req) => {
             link: articleLink,
             league,
             pub_date: new Date(item.pubDate).toISOString(),
+            image_url: imageUrl,
           },
-          { onConflict: 'link', ignoreDuplicates: true }
+          { onConflict: 'link', ignoreDuplicates: false }
         )
         if (!error) totalInserted++
       }
