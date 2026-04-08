@@ -22,6 +22,10 @@ export function HomePage() {
       <div className="lg:flex lg:gap-6 lg:py-6">
         {/* Main news list */}
         <div className="flex-1">
+          {/* PC league tabs (shown inside main column on PC) */}
+          <div className="hidden lg:block mb-4">
+            <LeagueTabs selected={league} onSelect={setLeague} />
+          </div>
           <NewsList articles={articles} loading={loading} error={error} />
         </div>
 
