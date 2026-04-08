@@ -20,9 +20,7 @@ export function useArticles(league: LeagueKey, page: number = 1, search?: string
         .order('pub_date', { ascending: false })
         .range((page - 1) * perPage, page * perPage - 1)
 
-      if (league !== 'all') {
-        query = query.eq('league', league)
-      }
+      query = query.eq('league', league)
 
       if (search) query = query.ilike('title', '%' + search + '%')
 

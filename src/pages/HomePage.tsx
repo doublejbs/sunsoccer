@@ -7,7 +7,7 @@ import { useArticles } from '../hooks/useArticles'
 import type { LeagueKey } from '../lib/constants'
 
 export function HomePage() {
-  const [league, setLeague] = useState<LeagueKey>('all')
+  const [league, setLeague] = useState<LeagueKey>('epl')
   const [searchParams] = useSearchParams()
   const search = searchParams.get('search') ?? undefined
   const { articles, loading, error } = useArticles(league, 1, search)

@@ -1,5 +1,4 @@
 export const LEAGUES = [
-  { key: 'all', label: '전체' },
   { key: 'epl', label: 'EPL' },
   { key: 'laliga', label: '라리가' },
   { key: 'seriea', label: '세리에A' },
