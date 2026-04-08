@@ -23,7 +23,7 @@ interface NaverNewsItem {
 }
 
 async function fetchNaverNews(query: string): Promise<NaverNewsItem[]> {
-  const url = `https://openapi.naver.com/v1/search/news.json?query=${encodeURIComponent(query)}&display=50&sort=date`
+  const url = `https://openapi.naver.com/v1/search/news.json?query=${encodeURIComponent(query)}&display=100&sort=date`
   const res = await fetch(url, {
     headers: {
       'X-Naver-Client-Id': NAVER_CLIENT_ID,
