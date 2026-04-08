@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 import { useArticle } from '../hooks/useArticle'
 import { CommentSection } from '../components/CommentSection'
 import { TimeAgo } from '../components/TimeAgo'
+import { AdBanner } from '../components/AdBanner'
 
 export function ArticlePage() {
   const { id } = useParams<{ id: string }>()
@@ -29,6 +30,7 @@ export function ArticlePage() {
           원문 기사 보기 →
         </a>
       </div>
+      <AdBanner slot="SLOT_ID_3" className="my-4" />
       <CommentSection articleId={article.id} commentCount={article.comment_count} />
     </div>
   )
