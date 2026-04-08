@@ -44,7 +44,7 @@ function extractSource(link: string): string {
   catch { return '알 수 없음' }
 }
 
-async function extractOgImage(url: string): Promise<string | null> {
+async function extractOgMeta(url: string): Promise<{ image: string | null; title: string | null }> {
   try {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 3000)
@@ -53,13 +53,18 @@ async function extractOgImage(url: string): Promise<string | null> {
       headers: { 'User-Agent': 'Mozilla/5.0' }
     })
     clearTimeout(timeout)
-    if (!res.ok) return null
+    if (!res.ok) return { image: null, title: null }
     const html = await res.text()
-    const match = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+    const imageMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
       || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
-    return match ? match[1] : null
+    const titleMatch = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)
+      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i)
+    return {
+      image: imageMatch ? imageMatch[1] : null,
+      title: titleMatch ? titleMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>') : null,
+    }
   } catch {
-    return null
+    return { image: null, title: null }
   }
 }
 
@@ -72,16 +77,16 @@ serve(async (req) => {
       const items = await fetchNaverNews(query)
       for (const item of items) {
         const articleLink = item.originallink || item.link
-        const imageUrl = await extractOgImage(articleLink)
+        const og = await extractOgMeta(articleLink)
         const { error } = await supabase.from('articles').upsert(
           {
-            title: stripHtmlTags(item.title),
+            title: og.title || stripHtmlTags(item.title),
             description: stripHtmlTags(item.description),
             source: extractSource(articleLink),
             link: articleLink,
             league,
             pub_date: new Date(item.pubDate).toISOString(),
-            image_url: imageUrl,
+            image_url: og.image,
           },
           { onConflict: 'link', ignoreDuplicates: false }
         )
