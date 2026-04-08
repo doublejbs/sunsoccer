@@ -10,7 +10,7 @@ export function HomePage() {
   const [league, setLeague] = useState<LeagueKey>('epl')
   const [searchParams] = useSearchParams()
   const search = searchParams.get('search') ?? undefined
-  const { articles, loading, error } = useArticles(league, 1, search)
+  const { articles, loading, error, hasMore, loadMore } = useArticles(league, search)
 
   return (
     <div>
@@ -26,7 +26,7 @@ export function HomePage() {
           <div className="hidden lg:block mb-4">
             <LeagueTabs selected={league} onSelect={setLeague} />
           </div>
-          <NewsList articles={articles} loading={loading} error={error} />
+          <NewsList articles={articles} loading={loading} error={error} hasMore={hasMore} onLoadMore={loadMore} />
         </div>
 
         {/* Sidebar: PC only */}

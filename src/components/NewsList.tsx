@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { NewsCard } from './NewsCard'
 import { FeaturedCards } from './FeaturedCards'
 import type { Article } from '../lib/types'
@@ -6,10 +7,30 @@ interface NewsListProps {
   articles: Article[]
   loading: boolean
   error: string | null
+  hasMore?: boolean
+  onLoadMore?: () => void
 }
 
-export function NewsList({ articles, loading, error }: NewsListProps) {
-  if (loading) {
+export function NewsList({ articles, loading, error, hasMore, onLoadMore }: NewsListProps) {
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!hasMore || !onLoadMore) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) onLoadMore()
+      },
+      { threshold: 0.1 }
+    )
+
+    const sentinel = sentinelRef.current
+    if (sentinel) observer.observe(sentinel)
+
+    return () => { if (sentinel) observer.unobserve(sentinel) }
+  }, [hasMore, onLoadMore])
+
+  if (loading && articles.length === 0) {
     return (
       <div className="py-8 text-center text-gray-400 text-sm">
         뉴스를 불러오는 중...
@@ -46,6 +67,13 @@ export function NewsList({ articles, loading, error }: NewsListProps) {
           <NewsCard key={article.id} article={article} />
         ))}
       </div>
+
+      {/* Infinite scroll sentinel */}
+      {hasMore && (
+        <div ref={sentinelRef} className="py-6 text-center text-gray-400 text-sm">
+          {loading ? '불러오는 중...' : ''}
+        </div>
+      )}
     </div>
   )
 }
