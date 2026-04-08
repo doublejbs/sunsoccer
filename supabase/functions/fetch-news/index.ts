@@ -36,7 +36,25 @@ async function fetchNaverNews(query: string): Promise<NaverNewsItem[]> {
 }
 
 function stripHtmlTags(str: string): string {
-  return str.replace(/<[^>]*>/g, '').replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  return str
+    .replace(/<[^>]*>/g, '')
+    .replace(/&#0*39;/g, "'")
+    .replace(/&#x27;/gi, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&#0*34;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&lsquo;/g, '\u2018')
+    .replace(/&rsquo;/g, '\u2019')
+    .replace(/&ldquo;/g, '\u201C')
+    .replace(/&rdquo;/g, '\u201D')
+    .replace(/&hellip;/g, '\u2026')
+    .replace(/&middot;/g, '\u00B7')
+    .replace(/&#(\d+);/g, (_m, c) => String.fromCharCode(Number(c)))
+    .replace(/&#x([0-9a-f]+);/gi, (_m, c) => String.fromCharCode(parseInt(c, 16)))
 }
 
 function extractSource(link: string): string {
@@ -61,7 +79,7 @@ async function extractOgMeta(url: string): Promise<{ image: string | null; title
       || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i)
     const descMatch = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i)
       || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i)
-    const decode = (s: string) => s.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    const decode = (s: string) => stripHtmlTags(s)
     return {
       image: imageMatch ? imageMatch[1] : null,
       title: titleMatch ? decode(titleMatch[1]) : null,
