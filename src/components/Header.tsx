@@ -36,7 +36,7 @@ export function Header() {
           />
           {user ? (
             <div className="flex items-center gap-3">
-              <Link to="/my" className="text-sm text-gray-700 hover:text-gray-900">
+              <Link to="/mypage" className="text-sm text-gray-700 hover:text-gray-900">
                 {profile?.nickname ?? user.email}
               </Link>
               <button

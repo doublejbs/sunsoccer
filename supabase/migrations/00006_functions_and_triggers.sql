@@ -36,7 +36,7 @@ CREATE OR REPLACE FUNCTION decrement_comment_count()
 RETURNS TRIGGER AS $$
 BEGIN
   IF OLD.parent_id IS NULL THEN
-    UPDATE articles SET comment_count = comment_count - 1 WHERE id = OLD.article_id;
+    UPDATE articles SET comment_count = GREATEST(comment_count - 1, 0) WHERE id = OLD.article_id;
   END IF;
   RETURN OLD;
 END;
@@ -56,6 +56,11 @@ RETURNS void AS $$
 DECLARE
   existing_vote TEXT;
 BEGIN
+  -- Verify the caller is the user they claim to be
+  IF p_user_id != auth.uid() THEN
+    RAISE EXCEPTION 'Unauthorized: user ID mismatch';
+  END IF;
+
   -- Check for existing vote
   SELECT vote_type INTO existing_vote
   FROM comment_votes
