@@ -30,7 +30,7 @@ export function ArticlePage() {
           원문 기사 보기 →
         </a>
       </div>
-      <AdBanner slot="SLOT_ID_3" className="my-4" />
+      <AdBanner slot="8401350370" className="my-4" />
       <CommentSection articleId={article.id} commentCount={article.comment_count} />
     </div>
   )
