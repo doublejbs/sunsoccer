@@ -7,7 +7,6 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
 const SEARCH_QUERIES: Record<string, string> = {
-  all: '해외축구',
   epl: '프리미어리그',
   laliga: '라리가',
   seriea: '세리에A',
