@@ -21,7 +21,7 @@ export function HomePage() {
 
       {/* Section title — The Sun style */}
       <div className="px-4 lg:px-0 pt-4 pb-2">
-        <h1 className="font-headline font-bold text-2xl lg:text-3xl text-[#111] tracking-tight">FOOTBALL</h1>
+        <h1 className="font-bold text-2xl lg:text-3xl text-[#111] tracking-tight">FOOTBALL</h1>
       </div>
 
       <div className="lg:flex lg:gap-6 lg:pb-6">

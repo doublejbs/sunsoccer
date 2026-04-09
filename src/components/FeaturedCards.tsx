@@ -30,7 +30,7 @@ export function FeaturedCards({ articles }: FeaturedCardsProps) {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 lg:p-8">
-          <h2 className="font-headline font-bold text-white text-xl lg:text-3xl leading-tight mb-2 drop-shadow-lg line-clamp-3">
+          <h2 className="font-bold font-bold text-white text-xl lg:text-3xl leading-tight mb-2 drop-shadow-lg line-clamp-3">
             {first.title}
           </h2>
           <div className="flex items-center gap-2 text-xs text-white/70">
@@ -60,7 +60,7 @@ export function FeaturedCards({ articles }: FeaturedCardsProps) {
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-4 lg:p-6">
-            <h3 className="font-headline font-bold text-white text-base lg:text-xl leading-tight mb-1.5 drop-shadow-lg line-clamp-2">
+            <h3 className="font-bold font-bold text-white text-base lg:text-xl leading-tight mb-1.5 drop-shadow-lg line-clamp-2">
               {second.title}
             </h3>
             <div className="flex items-center gap-2 text-xs text-white/70">

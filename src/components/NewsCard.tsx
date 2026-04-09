@@ -14,7 +14,7 @@ export function NewsCard({ article }: NewsCardProps) {
       )}
       <div className="p-3">
         <span className="text-[11px] text-gray-400 mb-1 block">{article.source}</span>
-        <h3 className="font-headline font-bold text-[#111] leading-snug mb-1.5 line-clamp-3 text-sm lg:text-base">
+        <h3 className="font-bold font-bold text-[#111] leading-snug mb-1.5 line-clamp-3 text-sm lg:text-base">
           {article.title}
         </h3>
         <div className="flex items-center gap-2 text-xs text-gray-400">

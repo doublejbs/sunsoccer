@@ -14,7 +14,7 @@ export function ArticlePage() {
   return (
     <div className="px-4 lg:px-0 py-4">
       <div className="pb-4 border-b-2 border-[#111]">
-        <h1 className="text-lg font-bold text-[#111] font-headline leading-snug mb-2">{article.title}</h1>
+        <h1 className="text-lg font-bold text-[#111] leading-snug mb-2">{article.title}</h1>
         <div className="text-sm text-gray-500 mb-3">
           {article.source} · <TimeAgo date={article.pub_date} />
         </div>
