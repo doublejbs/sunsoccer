@@ -147,6 +147,16 @@ export function MatchesPage() {
           </div>
         )}
       </div>
+
+      {/* Scroll to today button */}
+      {!loading && groups.length > 0 && (
+        <button
+          onClick={() => todayRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#111] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg hover:bg-gray-800 transition-colors z-20"
+        >
+          오늘 경기 보기
+        </button>
+      )}
     </div>
   )
 }
