@@ -22,7 +22,7 @@ export function ArticlePage() {
           <img
             src={article.image_url}
             alt=""
-            className="w-full rounded-lg mb-3"
+            className="w-full max-h-64 object-cover rounded-lg mb-3"
           />
         )}
         <p className="text-sm text-gray-700 leading-relaxed mb-3">{article.description}</p>
