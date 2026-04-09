@@ -1,55 +1,75 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { LeagueTabs } from '../components/LeagueTabs'
 import { useMatches } from '../hooks/useMatches'
 import type { LeagueKey } from '../lib/constants'
 import type { Match } from '../lib/types'
 
-function formatDateKey(utcDate: string) {
-  const d = new Date(utcDate)
-  return d.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
+function toDateKey(utcDate: string) {
+  return new Date(utcDate).toISOString().split('T')[0]
 }
 
-function formatDateLabel(utcDate: string) {
-  const d = new Date(utcDate)
+function formatDateLabel(dateKey: string) {
+  const d = new Date(dateKey + 'T12:00:00')
   const today = new Date()
-  const tomorrow = new Date(today)
-  tomorrow.setDate(today.getDate() + 1)
+  const todayKey = today.toISOString().split('T')[0]
   const yesterday = new Date(today)
   yesterday.setDate(today.getDate() - 1)
+  const tomorrow = new Date(today)
+  tomorrow.setDate(today.getDate() + 1)
 
-  const dateStr = d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })
+  const label = d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })
 
-  if (d.toDateString() === today.toDateString()) return `오늘 · ${dateStr}`
-  if (d.toDateString() === yesterday.toDateString()) return `어제 · ${dateStr}`
-  if (d.toDateString() === tomorrow.toDateString()) return `내일 · ${dateStr}`
-  return dateStr
+  if (dateKey === todayKey) return { label: `오늘`, sub: label, isToday: true }
+  if (dateKey === yesterday.toISOString().split('T')[0]) return { label: '어제', sub: label, isToday: false }
+  if (dateKey === tomorrow.toISOString().split('T')[0]) return { label: '내일', sub: label, isToday: false }
+  return { label, sub: '', isToday: false }
+}
+
+interface DateGroup {
+  dateKey: string
+  matchday: number
+  matches: Match[]
 }
 
 export function MatchesPage() {
   const [league, setLeague] = useState<LeagueKey>('epl')
   const { matches, loading, error } = useMatches(league)
+  const todayRef = useRef<HTMLDivElement>(null)
+  const scrolledRef = useRef(false)
 
-  // Sort matches by date descending (most recent first)
-  const sorted = [...matches].sort((a, b) => new Date(b.utcDate).getTime() - new Date(a.utcDate).getTime())
+  // Sort ascending (past → future)
+  const sorted = [...matches].sort((a, b) => new Date(a.utcDate).getTime() - new Date(b.utcDate).getTime())
 
   // Group by date
-  const grouped: { dateKey: string; dateLabel: string; matchday: number; matches: Match[] }[] = []
+  const groups: DateGroup[] = []
   const seen = new Map<string, number>()
-
   for (const match of sorted) {
-    const key = formatDateKey(match.utcDate)
+    const key = toDateKey(match.utcDate)
     if (seen.has(key)) {
-      grouped[seen.get(key)!].matches.push(match)
+      groups[seen.get(key)!].matches.push(match)
     } else {
-      seen.set(key, grouped.length)
-      grouped.push({
-        dateKey: key,
-        dateLabel: formatDateLabel(match.utcDate),
-        matchday: match.matchday,
-        matches: [match],
-      })
+      seen.set(key, groups.length)
+      groups.push({ dateKey: key, matchday: match.matchday, matches: [match] })
     }
   }
+
+  // Find today or closest future date for scroll target
+  const todayKey = new Date().toISOString().split('T')[0]
+  const todayIndex = groups.findIndex(g => g.dateKey >= todayKey)
+
+  useEffect(() => {
+    if (!loading && groups.length > 0 && todayRef.current && !scrolledRef.current) {
+      scrolledRef.current = true
+      setTimeout(() => {
+        todayRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 100)
+    }
+  }, [loading, groups.length])
+
+  // Reset scroll flag on league change
+  useEffect(() => {
+    scrolledRef.current = false
+  }, [league])
 
   return (
     <div>
@@ -66,69 +86,121 @@ export function MatchesPage() {
         {loading && <div className="py-8 text-center text-gray-400 text-sm">경기 일정을 불러오는 중...</div>}
         {error && <div className="py-8 text-center text-red-500 text-sm">오류: {error}</div>}
 
-        {!loading && !error && grouped.length === 0 && (
+        {!loading && !error && groups.length === 0 && (
           <div className="py-8 text-center text-gray-400 text-sm">경기 일정이 없습니다.</div>
         )}
 
-        {grouped.map((group) => (
-          <div key={group.dateKey} className="mb-5">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-semibold text-[#111]">{group.dateLabel}</h2>
-              <span className="text-xs text-gray-400">라운드 {group.matchday}</span>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
-              {group.matches.map((match, i) => (
-                <MatchRow key={match.id} match={match} showBorder={i < group.matches.length - 1} />
-              ))}
-            </div>
+        {!loading && !error && groups.length > 0 && (
+          <div className="relative">
+            {/* Timeline line */}
+            <div className="absolute left-[7px] lg:left-[9px] top-0 bottom-0 w-px bg-gray-200" />
+
+            {groups.map((group, idx) => {
+              const { label, sub, isToday } = formatDateLabel(group.dateKey)
+              const isTodayOrTarget = idx === todayIndex
+              const isPast = idx < (todayIndex === -1 ? groups.length : todayIndex)
+
+              return (
+                <div
+                  key={group.dateKey}
+                  ref={isTodayOrTarget ? todayRef : undefined}
+                  className="relative pl-7 lg:pl-8 pb-5"
+                >
+                  {/* Timeline dot */}
+                  <div className={`absolute left-0 top-1 w-[15px] h-[15px] lg:w-[19px] lg:h-[19px] rounded-full border-2 ${
+                    isToday
+                      ? 'bg-[#111] border-[#111] ring-4 ring-gray-200'
+                      : isPast
+                        ? 'bg-gray-300 border-gray-300'
+                        : 'bg-white border-gray-300'
+                  }`} />
+
+                  {/* Date header */}
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <span className={`text-sm font-bold ${isToday ? 'text-[#111]' : isPast ? 'text-gray-400' : 'text-[#111]'}`}>
+                      {label}
+                    </span>
+                    {sub && <span className="text-xs text-gray-400">{sub}</span>}
+                    <span className="text-[11px] text-gray-300 ml-auto">R{group.matchday}</span>
+                  </div>
+
+                  {/* Match cards */}
+                  <div className={`rounded-xl border overflow-hidden ${
+                    isToday
+                      ? 'bg-white border-gray-200 shadow-sm'
+                      : isPast
+                        ? 'bg-gray-50/70 border-gray-100'
+                        : 'bg-white border-gray-100'
+                  }`}>
+                    {group.matches.map((match, i) => (
+                      <MatchRow
+                        key={match.id}
+                        match={match}
+                        dimmed={isPast}
+                        showBorder={i < group.matches.length - 1}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
           </div>
-        ))}
+        )}
       </div>
     </div>
   )
 }
 
-function MatchRow({ match, showBorder }: { match: Match; showBorder: boolean }) {
+function MatchRow({ match, dimmed, showBorder }: { match: Match; dimmed: boolean; showBorder: boolean }) {
   const isLive = match.status === 'LIVE' || match.status === 'IN_PLAY' || match.status === 'PAUSED'
   const isFinished = match.status === 'FINISHED'
   const date = new Date(match.utcDate)
 
   return (
-    <div className={`flex items-center py-3 px-4 ${showBorder ? 'border-b border-gray-50' : ''}`}>
+    <div className={`flex items-center py-3 px-3 lg:px-4 ${showBorder ? 'border-b border-gray-100' : ''} ${dimmed && !isLive ? 'opacity-60' : ''}`}>
       {/* Home team */}
-      <div className="flex-1 flex items-center justify-end gap-2">
-        <span className="text-sm text-[#111] text-right">{match.homeTeam.shortName}</span>
+      <div className="flex-1 flex items-center justify-end gap-1.5 min-w-0">
+        <span className="text-sm text-[#111] text-right truncate">{match.homeTeam.shortName}</span>
         {match.homeTeam.crest && (
-          <img src={match.homeTeam.crest} alt="" className="w-5 h-5 object-contain" />
+          <img src={match.homeTeam.crest} alt="" className="w-5 h-5 object-contain flex-shrink-0" />
         )}
       </div>
 
       {/* Score / Time */}
-      <div className="w-20 text-center mx-2">
+      <div className="w-20 text-center mx-1.5 flex-shrink-0">
         {isLive ? (
           <div>
             <span className="text-sm font-bold text-[#111]">
               {match.score.fullTime.home} - {match.score.fullTime.away}
             </span>
-            <span className="block text-[10px] text-red-500 font-semibold animate-pulse">진행중</span>
+            <div className="flex items-center justify-center gap-1 mt-0.5">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+              <span className="text-[10px] text-red-500 font-semibold">LIVE</span>
+            </div>
           </div>
         ) : isFinished ? (
-          <span className="text-sm font-bold text-[#111]">
-            {match.score.fullTime.home} - {match.score.fullTime.away}
-          </span>
+          <div>
+            <span className="text-sm font-bold text-[#111]">
+              {match.score.fullTime.home} - {match.score.fullTime.away}
+            </span>
+            <span className="block text-[10px] text-gray-400">종료</span>
+          </div>
         ) : (
-          <span className="text-xs text-gray-400">
-            {date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
-          </span>
+          <div>
+            <span className="text-sm font-semibold text-[#111]">
+              {date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+            </span>
+            <span className="block text-[10px] text-gray-400">예정</span>
+          </div>
         )}
       </div>
 
       {/* Away team */}
-      <div className="flex-1 flex items-center gap-2">
+      <div className="flex-1 flex items-center gap-1.5 min-w-0">
         {match.awayTeam.crest && (
-          <img src={match.awayTeam.crest} alt="" className="w-5 h-5 object-contain" />
+          <img src={match.awayTeam.crest} alt="" className="w-5 h-5 object-contain flex-shrink-0" />
         )}
-        <span className="text-sm text-[#111]">{match.awayTeam.shortName}</span>
+        <span className="text-sm text-[#111] truncate">{match.awayTeam.shortName}</span>
       </div>
     </div>
   )

@@ -38,8 +38,15 @@ serve(async (req) => {
   if (type === 'standings') {
     endpoint = `${BASE_URL}/competitions/${competitionCode}/standings`
   } else {
-    // Get matches for current matchday and nearby
-    endpoint = `${BASE_URL}/competitions/${competitionCode}/matches?status=SCHEDULED,LIVE,IN_PLAY,PAUSED,FINISHED&limit=20`
+    // Get matches ±30 days from today
+    const today = new Date()
+    const from = new Date(today)
+    from.setDate(today.getDate() - 30)
+    const to = new Date(today)
+    to.setDate(today.getDate() + 30)
+    const fromStr = from.toISOString().split('T')[0]
+    const toStr = to.toISOString().split('T')[0]
+    endpoint = `${BASE_URL}/competitions/${competitionCode}/matches?dateFrom=${fromStr}&dateTo=${toStr}`
   }
 
   try {
