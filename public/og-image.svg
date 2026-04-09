@@ -1,8 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <rect width="1200" height="630" fill="#111"/>
-  <rect x="380" y="220" width="140" height="60" rx="4" fill="#fff"/>
-  <text x="450" y="263" font-family="Arial Black, sans-serif" font-weight="900" font-size="40" fill="#111" text-anchor="middle">SUN</text>
-  <text x="640" y="263" font-family="Arial Black, sans-serif" font-weight="900" font-size="40" fill="#fff" text-anchor="start">CHOOK</text>
-  <text x="600" y="340" font-family="Arial, sans-serif" font-size="24" fill="#999" text-anchor="middle">해외축구 뉴스 &amp; 댓글 커뮤니티</text>
-  <text x="600" y="390" font-family="Arial, sans-serif" font-size="18" fill="#666" text-anchor="middle">EPL · 라리가 · 세리에A · 분데스리가 · 리그앙</text>
+  <rect x="410" y="255" width="160" height="70" rx="6" fill="#fff"/>
+  <text x="490" y="307" font-family="Arial Black, sans-serif" font-weight="900" font-size="52" fill="#111" text-anchor="middle">SUN</text>
+  <text x="590" y="307" font-family="Arial Black, sans-serif" font-weight="900" font-size="52" fill="#fff" text-anchor="start">CHOOK</text>
 </svg>
