@@ -1,16 +1,56 @@
+-- Generate fun random Korean nickname
+CREATE OR REPLACE FUNCTION generate_random_nickname()
+RETURNS TEXT AS $$
+DECLARE
+  adjectives TEXT[] := ARRAY[
+    '빠른', '용감한', '행복한', '멋진', '강한',
+    '밝은', '신나는', '대단한', '열정의', '전설의',
+    '화려한', '날카로운', '거친', '냉정한', '뜨거운',
+    '위대한', '무적의', '최강의', '불꽃', '번개'
+  ];
+  nouns TEXT[] := ARRAY[
+    '스트라이커', '골키퍼', '미드필더', '수비수', '감독',
+    '팬', '서포터', '캡틴', '에이스', '루키',
+    '드리블러', '슈터', '해결사', '사령탑', '철벽',
+    '축구왕', '골잡이', '패서', '윙어', '플레이어'
+  ];
+  nickname TEXT;
+  attempts INT := 0;
+BEGIN
+  LOOP
+    nickname := adjectives[1 + floor(random() * array_length(adjectives, 1))::int]
+      || nouns[1 + floor(random() * array_length(nouns, 1))::int]
+      || floor(random() * 1000)::text;
+    -- Check uniqueness
+    EXIT WHEN NOT EXISTS (SELECT 1 FROM public.profiles WHERE public.profiles.nickname = generate_random_nickname.nickname);
+    attempts := attempts + 1;
+    EXIT WHEN attempts > 10;
+  END LOOP;
+  RETURN nickname;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
 -- Auto-create profile on user signup
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO profiles (id, nickname, avatar_url)
+  INSERT INTO public.profiles (id, nickname, avatar_url)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'name', 'user_' || substr(NEW.id::text, 1, 8)),
+    generate_random_nickname(),
+    NEW.raw_user_meta_data->>'avatar_url'
+  );
+  RETURN NEW;
+EXCEPTION WHEN unique_violation THEN
+  INSERT INTO public.profiles (id, nickname, avatar_url)
+  VALUES (
+    NEW.id,
+    '축구팬' || floor(random() * 99999)::text,
     NEW.raw_user_meta_data->>'avatar_url'
   );
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
