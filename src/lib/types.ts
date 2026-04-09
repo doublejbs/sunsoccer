@@ -37,3 +37,28 @@ export interface Profile {
   avatar_url: string | null
   created_at: string
 }
+
+export interface Match {
+  id: number
+  utcDate: string
+  status: 'SCHEDULED' | 'LIVE' | 'IN_PLAY' | 'PAUSED' | 'FINISHED' | 'POSTPONED' | 'CANCELLED'
+  matchday: number
+  homeTeam: { id: number; name: string; shortName: string; crest: string }
+  awayTeam: { id: number; name: string; shortName: string; crest: string }
+  score: {
+    fullTime: { home: number | null; away: number | null }
+  }
+}
+
+export interface Standing {
+  position: number
+  team: { id: number; name: string; shortName: string; crest: string }
+  playedGames: number
+  won: number
+  draw: number
+  lost: number
+  points: number
+  goalsFor: number
+  goalsAgainst: number
+  goalDifference: number
+}
