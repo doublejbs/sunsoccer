@@ -41,7 +41,7 @@ export function NewsList({ articles, loading, error, hasMore, onLoadMore }: News
 
   if (error) {
     return (
-      <div className="py-8 text-center text-red-400 text-sm">
+      <div className="py-8 text-center text-red-500 text-sm">
         오류가 발생했습니다: {error}
       </div>
     )

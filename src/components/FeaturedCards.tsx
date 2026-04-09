@@ -12,50 +12,66 @@ export function FeaturedCards({ articles }: FeaturedCardsProps) {
   const [first, second] = articles
 
   return (
-    <div className="px-4 lg:px-0 mb-2">
-      {/* Single hero on mobile, side-by-side on PC */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <FeaturedCard article={first} priority />
-        {second && <FeaturedCard article={second} />}
-      </div>
-    </div>
-  )
-}
-
-function FeaturedCard({ article, priority }: { article: Article; priority?: boolean }) {
-  return (
-    <Link
-      to={`/news/${article.id}`}
-      className="group relative block rounded-none lg:rounded-lg overflow-hidden bg-gray-200"
-    >
-      {/* Image */}
-      {article.image_url ? (
-        <img
-          src={article.image_url}
-          alt=""
-          loading={priority ? 'eager' : 'lazy'}
-          className="w-full h-48 lg:h-56 object-cover opacity-80 group-hover:opacity-60 group-hover:scale-105 transition-all duration-500"
-        />
-      ) : (
-        <div className="w-full h-48 lg:h-56 bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a]" />
-      )}
-
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-
-      {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 lg:p-5">
-        <h3 className="text-[15px] lg:text-lg font-bold text-white leading-snug mb-2 line-clamp-2 drop-shadow-sm">
-          {article.title}
-        </h3>
-        <div className="flex items-center gap-2 text-xs text-gray-300">
-          <span>{article.source}</span>
-          <span className="opacity-50">·</span>
-          <TimeAgo date={article.pub_date} />
-          <span className="opacity-50">·</span>
-          <span>💬 {article.comment_count}</span>
+    <div className="mb-4">
+      {/* Hero — full width, The Sun style */}
+      <Link
+        to={`/news/${first.id}`}
+        className="group relative block overflow-hidden"
+      >
+        {first.image_url ? (
+          <img
+            src={first.image_url}
+            alt=""
+            loading="eager"
+            className="w-full h-64 lg:h-[400px] object-cover group-hover:scale-105 transition-transform duration-700"
+          />
+        ) : (
+          <div className="w-full h-64 lg:h-[400px] bg-gray-800" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-5 lg:p-8">
+          <h2 className="font-headline font-bold text-white text-xl lg:text-3xl leading-tight mb-2 drop-shadow-lg line-clamp-3">
+            {first.title}
+          </h2>
+          <div className="flex items-center gap-2 text-xs text-white/70">
+            <span className="bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide">{first.source}</span>
+            <TimeAgo date={first.pub_date} />
+            <span>·</span>
+            <span>💬 {first.comment_count}</span>
+          </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+
+      {/* Second article — smaller */}
+      {second && (
+        <Link
+          to={`/news/${second.id}`}
+          className="group relative block overflow-hidden mt-3 mx-4 lg:mx-0"
+        >
+          {second.image_url ? (
+            <img
+              src={second.image_url}
+              alt=""
+              loading="lazy"
+              className="w-full h-40 lg:h-52 object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+          ) : (
+            <div className="w-full h-40 lg:h-52 bg-gray-700" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-4 lg:p-6">
+            <h3 className="font-headline font-bold text-white text-base lg:text-xl leading-tight mb-1.5 drop-shadow-lg line-clamp-2">
+              {second.title}
+            </h3>
+            <div className="flex items-center gap-2 text-xs text-white/70">
+              <span className="bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide">{second.source}</span>
+              <TimeAgo date={second.pub_date} />
+              <span>·</span>
+              <span>💬 {second.comment_count}</span>
+            </div>
+          </div>
+        </Link>
+      )}
+    </div>
   )
 }

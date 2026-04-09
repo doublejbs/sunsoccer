@@ -19,11 +19,16 @@ export function HomePage() {
         <LeagueTabs selected={league} onSelect={setLeague} />
       </div>
 
-      <div className="lg:flex lg:gap-6 lg:py-6">
+      {/* Section title — The Sun style */}
+      <div className="px-4 lg:px-0 pt-4 pb-2">
+        <h1 className="font-headline font-bold text-2xl lg:text-3xl text-[#111] tracking-tight">FOOTBALL</h1>
+      </div>
+
+      <div className="lg:flex lg:gap-6 lg:pb-6">
         {/* Main news list */}
         <div className="flex-1">
           {/* PC league tabs (shown inside main column on PC) */}
-          <div className="hidden lg:block mb-4">
+          <div className="hidden lg:block mb-4 px-0">
             <LeagueTabs selected={league} onSelect={setLeague} />
           </div>
           <NewsList articles={articles} loading={loading} error={error} hasMore={hasMore} onLoadMore={loadMore} />
