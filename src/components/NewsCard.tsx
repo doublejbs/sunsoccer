@@ -8,24 +8,16 @@ interface NewsCardProps {
 
 export function NewsCard({ article }: NewsCardProps) {
   return (
-    <Link to={`/news/${article.id}`} className="flex gap-3 py-4 border-b border-[#222]">
+    <Link to={`/news/${article.id}`} className="block bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
       {article.image_url && (
-        <img
-          src={article.image_url}
-          alt=""
-          className="w-20 h-20 lg:w-[120px] lg:h-20 object-cover rounded-lg flex-shrink-0"
-        />
+        <img src={article.image_url} alt="" className="w-full h-40 object-cover" />
       )}
-      <div className="flex-1 min-w-0">
-        <h3 className="text-[15px] lg:text-base font-semibold text-[#f0f0f0] leading-snug mb-1.5 line-clamp-2">
+      <div className="p-3">
+        <span className="inline-block bg-[#111] text-white text-[10px] font-bold px-1.5 py-0.5 uppercase tracking-wide mb-2">{article.source}</span>
+        <h3 className="font-headline font-bold text-[#111] leading-snug mb-1.5 line-clamp-3 text-sm lg:text-base">
           {article.title}
         </h3>
-        <p className="hidden lg:block text-sm text-gray-400 leading-relaxed mb-2 line-clamp-2">
-          {article.description}
-        </p>
-        <div className="flex items-center gap-2 text-xs text-gray-500">
-          <span>{article.source}</span>
-          <span>·</span>
+        <div className="flex items-center gap-2 text-xs text-gray-400">
           <TimeAgo date={article.pub_date} />
           <span>·</span>
           <span>💬 {article.comment_count}</span>

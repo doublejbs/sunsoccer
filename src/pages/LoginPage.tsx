@@ -13,14 +13,14 @@ export function LoginPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
       <div className="flex items-center gap-1 mb-2">
-        <span className="bg-[#e30613] text-white font-headline font-bold text-2xl px-2 py-0.5 leading-none tracking-tight">SUN</span>
-        <span className="text-[#f0f0f0] font-headline font-bold text-2xl tracking-tight">CHOOK</span>
+        <span className="bg-[#111] text-white font-headline font-bold text-2xl px-2 py-0.5 leading-none tracking-tight">SUN</span>
+        <span className="text-[#111] font-headline font-bold text-2xl tracking-tight">CHOOK</span>
       </div>
       <p className="text-sm text-gray-500 mb-8">해외축구 뉴스 & 댓글</p>
 
       <div className="w-full max-w-xs space-y-3">
         <button onClick={signInWithGoogle}
-          className="w-full flex items-center justify-center gap-3 bg-[#141414] border border-[#333] rounded-lg py-3 text-sm font-medium text-gray-200 hover:bg-[#1a1a1a] transition-colors">
+          className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 rounded-lg py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>

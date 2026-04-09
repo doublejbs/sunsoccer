@@ -13,8 +13,8 @@ export function ArticlePage() {
 
   return (
     <div className="px-4 lg:px-0 py-4">
-      <div className="pb-4 border-b-2 border-[#e30613]">
-        <h1 className="text-lg font-bold text-[#f0f0f0] leading-snug mb-2">{article.title}</h1>
+      <div className="pb-4 border-b-2 border-[#111]">
+        <h1 className="text-lg font-bold text-[#111] font-headline leading-snug mb-2">{article.title}</h1>
         <div className="text-sm text-gray-500 mb-3">
           {article.source} · <TimeAgo date={article.pub_date} />
         </div>
@@ -25,8 +25,8 @@ export function ArticlePage() {
             className="max-w-full max-h-64 rounded-lg mb-3 mx-auto block"
           />
         )}
-        <p className="text-sm text-gray-300 leading-relaxed mb-3">{article.description}</p>
-        <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-sm text-[#e30613] hover:underline">
+        <p className="text-sm text-gray-700 leading-relaxed mb-3">{article.description}</p>
+        <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-sm text-[#111] font-semibold hover:underline">
           원문 기사 보기 →
         </a>
       </div>

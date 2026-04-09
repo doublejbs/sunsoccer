@@ -80,7 +80,7 @@ export function MatchesPage() {
           <LeagueTabs selected={league} onSelect={setLeague} />
         </div>
 
-        <h1 className="text-lg font-bold text-[#f0f0f0] mb-4">경기 일정</h1>
+        <h1 className="text-lg font-bold text-[#111] mb-4">경기 일정</h1>
 
         {loading && <div className="py-8 text-center text-gray-500 text-sm">경기 일정을 불러오는 중...</div>}
         {error && <div className="py-8 text-center text-red-400 text-sm">오류: {error}</div>}
@@ -97,7 +97,7 @@ export function MatchesPage() {
                 <button
                   onClick={loadEarlier}
                   disabled={loadingMore}
-                  className="text-xs text-gray-400 border border-[#333] px-5 py-2 rounded-lg hover:border-[#555] disabled:opacity-40 transition-colors"
+                  className="text-xs text-gray-500 border border-gray-200 px-5 py-2 rounded-lg hover:border-gray-400 disabled:opacity-40 transition-colors"
                 >
                   {loadingMore ? '불러오는 중...' : '← 이전 경기 더보기'}
                 </button>
@@ -106,7 +106,7 @@ export function MatchesPage() {
 
             <div className="relative">
               {/* Timeline line */}
-              <div className="absolute left-[7px] lg:left-[9px] top-0 bottom-0 w-px bg-[#333]" />
+              <div className="absolute left-[7px] lg:left-[9px] top-0 bottom-0 w-px bg-gray-200" />
 
               {groups.map((group, idx) => {
                 const { label, sub, isToday } = formatDateLabel(group.dateKey)
@@ -122,28 +122,28 @@ export function MatchesPage() {
                     {/* Timeline dot */}
                     <div className={`absolute left-0 top-1 w-[15px] h-[15px] lg:w-[19px] lg:h-[19px] rounded-full border-2 ${
                       isToday
-                        ? 'bg-[#e30613] border-[#e30613] ring-4 ring-[#333]'
+                        ? 'bg-[#111] border-[#111] ring-4 ring-gray-200'
                         : isPast
-                          ? 'bg-[#333] border-[#333]'
-                          : 'bg-[#0a0a0a] border-[#555]'
+                          ? 'bg-gray-300 border-gray-300'
+                          : 'bg-white border-gray-300'
                     }`} />
 
                     {/* Date header */}
                     <div className="flex items-baseline gap-2 mb-2">
-                      <span className={`text-sm font-bold ${isToday ? 'text-[#f0f0f0]' : isPast ? 'text-gray-500' : 'text-[#f0f0f0]'}`}>
+                      <span className={`text-sm font-bold ${isToday ? 'text-[#111]' : isPast ? 'text-gray-400' : 'text-[#111]'}`}>
                         {label}
                       </span>
-                      {sub && <span className="text-xs text-gray-500">{sub}</span>}
-                      <span className="text-[11px] text-gray-600 ml-auto">R{group.matchday}</span>
+                      {sub && <span className="text-xs text-gray-400">{sub}</span>}
+                      <span className="text-[11px] text-gray-400 ml-auto">R{group.matchday}</span>
                     </div>
 
                     {/* Match cards */}
                     <div className={`rounded-xl border overflow-hidden ${
                       isToday
-                        ? 'bg-[#141414] border-[#333] shadow-none'
+                        ? 'bg-white border-gray-200 shadow-sm'
                         : isPast
-                          ? 'bg-[#0f0f0f] border-[#1a1a1a]'
-                          : 'bg-[#141414] border-[#222]'
+                          ? 'bg-gray-50 border-gray-100'
+                          : 'bg-white border-gray-100'
                     }`}>
                       {group.matches.map((match, i) => (
                         <MatchRow
@@ -165,7 +165,7 @@ export function MatchesPage() {
                 <button
                   onClick={loadLater}
                   disabled={loadingMore}
-                  className="text-xs text-gray-400 border border-[#333] px-5 py-2 rounded-lg hover:border-[#555] disabled:opacity-40 transition-colors"
+                  className="text-xs text-gray-500 border border-gray-200 px-5 py-2 rounded-lg hover:border-gray-400 disabled:opacity-40 transition-colors"
                 >
                   {loadingMore ? '불러오는 중...' : '다음 경기 더보기 →'}
                 </button>
@@ -179,7 +179,7 @@ export function MatchesPage() {
       {!loading && groups.length > 0 && (
         <button
           onClick={() => todayRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-          className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#e30613] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg hover:bg-[#c00510] transition-colors z-20"
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#111] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg hover:bg-gray-800 transition-colors z-20"
         >
           최근
         </button>
@@ -194,10 +194,10 @@ function MatchRow({ match, dimmed, showBorder }: { match: Match; dimmed: boolean
   const date = new Date(match.utcDate)
 
   return (
-    <div className={`flex items-center py-3 px-3 lg:px-4 ${showBorder ? 'border-b border-[#222]' : ''} ${dimmed && !isLive ? 'opacity-60' : ''}`}>
+    <div className={`flex items-center py-3 px-3 lg:px-4 ${showBorder ? 'border-b border-gray-100' : ''} ${dimmed && !isLive ? 'opacity-60' : ''}`}>
       {/* Home team */}
       <div className="flex-1 flex items-center justify-end gap-1.5 min-w-0">
-        <span className="text-sm text-[#f0f0f0] text-right truncate">{match.homeTeam.shortName}</span>
+        <span className="text-sm text-[#111] text-right truncate">{match.homeTeam.shortName}</span>
         {match.homeTeam.crest && (
           <img src={match.homeTeam.crest} alt="" className="w-5 h-5 object-contain flex-shrink-0" />
         )}
@@ -207,7 +207,7 @@ function MatchRow({ match, dimmed, showBorder }: { match: Match; dimmed: boolean
       <div className="w-20 text-center mx-1.5 flex-shrink-0">
         {isLive ? (
           <div>
-            <span className="text-sm font-bold text-[#f0f0f0]">
+            <span className="text-sm font-bold text-[#111]">
               {match.score.fullTime.home} - {match.score.fullTime.away}
             </span>
             <div className="flex items-center justify-center gap-1 mt-0.5">
@@ -217,17 +217,17 @@ function MatchRow({ match, dimmed, showBorder }: { match: Match; dimmed: boolean
           </div>
         ) : isFinished ? (
           <div>
-            <span className="text-sm font-bold text-[#f0f0f0]">
+            <span className="text-sm font-bold text-[#111]">
               {match.score.fullTime.home} - {match.score.fullTime.away}
             </span>
-            <span className="block text-[10px] text-gray-500">종료</span>
+            <span className="block text-[10px] text-gray-400">종료</span>
           </div>
         ) : (
           <div>
-            <span className="text-sm font-semibold text-[#f0f0f0]">
+            <span className="text-sm font-semibold text-[#111]">
               {date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
             </span>
-            <span className="block text-[10px] text-gray-500">예정</span>
+            <span className="block text-[10px] text-gray-400">예정</span>
           </div>
         )}
       </div>
@@ -237,7 +237,7 @@ function MatchRow({ match, dimmed, showBorder }: { match: Match; dimmed: boolean
         {match.awayTeam.crest && (
           <img src={match.awayTeam.crest} alt="" className="w-5 h-5 object-contain flex-shrink-0" />
         )}
-        <span className="text-sm text-[#f0f0f0] truncate">{match.awayTeam.shortName}</span>
+        <span className="text-sm text-[#111] truncate">{match.awayTeam.shortName}</span>
       </div>
     </div>
   )

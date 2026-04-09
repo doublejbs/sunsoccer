@@ -39,14 +39,14 @@ export function MyPage() {
   return (
     <div className="px-4 lg:px-0 py-6">
       <div className="mb-6">
-        <h1 className="text-lg font-bold text-[#f0f0f0] mb-3">마이페이지</h1>
+        <h1 className="text-lg font-bold text-[#111] mb-3">마이페이지</h1>
         {editing ? (
           <div className="flex items-center gap-2">
             <input
               value={nicknameInput}
               onChange={(e) => { setNicknameInput(e.target.value); setNicknameError(null) }}
               maxLength={20}
-              className="bg-[#141414] border border-[#333] text-gray-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-gray-500 w-48"
+              className="bg-white border border-gray-200 text-[#111] rounded-lg px-3 py-1.5 text-sm outline-none focus:border-gray-400 w-48"
               placeholder="새 닉네임"
               autoFocus
             />
@@ -59,23 +59,23 @@ export function MyPage() {
                 setSaving(false)
               }}
               disabled={saving}
-              className="text-xs bg-[#e30613] text-white px-3 py-1.5 rounded-lg disabled:opacity-40 hover:bg-[#c00510] transition-colors"
+              className="text-xs bg-[#111] text-white px-3 py-1.5 rounded-lg disabled:opacity-40 hover:bg-gray-800 transition-colors"
             >
               {saving ? '저장 중...' : '저장'}
             </button>
             <button
               onClick={() => { setEditing(false); setNicknameError(null) }}
-              className="text-xs text-gray-400 hover:text-gray-200"
+              className="text-xs text-gray-500 hover:text-[#111]"
             >
               취소
             </button>
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-300">{profile?.nickname ?? '설정 필요'}</span>
+            <span className="text-sm text-gray-700">{profile?.nickname ?? '설정 필요'}</span>
             <button
               onClick={() => { setNicknameInput(profile?.nickname ?? ''); setEditing(true) }}
-              className="text-xs text-[#e30613] hover:underline"
+              className="text-xs text-[#111] hover:underline"
             >
               수정
             </button>
@@ -84,7 +84,7 @@ export function MyPage() {
         {nicknameError && <p className="text-xs text-red-400 mt-1">{nicknameError}</p>}
       </div>
 
-      <h2 className="text-sm font-semibold text-[#f0f0f0] mb-3">내 댓글</h2>
+      <h2 className="text-sm font-semibold text-[#111] mb-3">내 댓글</h2>
       {loading ? (
         <div className="text-sm text-gray-500">불러오는 중...</div>
       ) : comments.length === 0 ? (
@@ -92,11 +92,11 @@ export function MyPage() {
       ) : (
         <ul className="space-y-0">
           {comments.map((c) => (
-            <li key={c.id} className="py-3 border-b border-[#222]">
-              <Link to={`/news/${c.articles?.id}`} className="text-xs text-[#e30613] hover:underline mb-1 block">
+            <li key={c.id} className="py-3 border-b border-gray-100">
+              <Link to={`/news/${c.articles?.id}`} className="text-xs text-[#111] hover:underline mb-1 block">
                 {c.articles?.title}
               </Link>
-              <p className="text-sm text-gray-300 mb-1">{c.content}</p>
+              <p className="text-sm text-gray-700 mb-1">{c.content}</p>
               <div className="text-xs text-gray-500 flex gap-2">
                 <span>👍 {c.likes}</span>
                 <span>👎 {c.dislikes}</span>

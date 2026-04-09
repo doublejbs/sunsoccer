@@ -26,7 +26,7 @@ function FeaturedCard({ article, priority }: { article: Article; priority?: bool
   return (
     <Link
       to={`/news/${article.id}`}
-      className="group relative block rounded-xl overflow-hidden bg-[#141414]"
+      className="group relative block rounded-none lg:rounded-lg overflow-hidden bg-gray-200"
     >
       {/* Image */}
       {article.image_url ? (
