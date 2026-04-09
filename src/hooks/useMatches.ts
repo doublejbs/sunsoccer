@@ -24,6 +24,8 @@ export function useMatches(league: LeagueKey) {
   const [error, setError] = useState<string | null>(null)
   const [earlierOffset, setEarlierOffset] = useState(0)
   const [laterOffset, setLaterOffset] = useState(0)
+  const [hasEarlier, setHasEarlier] = useState(true)
+  const [hasLater, setHasLater] = useState(true)
 
   async function fetchRange(from: string, to: string) {
     const { data: { session } } = await supabase.auth.getSession()
@@ -45,6 +47,8 @@ export function useMatches(league: LeagueKey) {
       setMatches([])
       setEarlierOffset(0)
       setLaterOffset(0)
+      setHasEarlier(true)
+      setHasLater(true)
       try {
         const { from, to } = getRange(0)
         const data = await fetchRange(from, to)
@@ -67,6 +71,7 @@ export function useMatches(league: LeagueKey) {
       setMatches(prev => {
         const existingIds = new Set(prev.map(m => m.id))
         const newMatches = data.filter(m => !existingIds.has(m.id))
+        if (newMatches.length === 0) setHasEarlier(false)
         return [...newMatches, ...prev]
       })
       setEarlierOffset(newOffset)
@@ -84,6 +89,7 @@ export function useMatches(league: LeagueKey) {
       setMatches(prev => {
         const existingIds = new Set(prev.map(m => m.id))
         const newMatches = data.filter(m => !existingIds.has(m.id))
+        if (newMatches.length === 0) setHasLater(false)
         return [...prev, ...newMatches]
       })
       setLaterOffset(newOffset)
@@ -91,5 +97,5 @@ export function useMatches(league: LeagueKey) {
     setLoadingMore(false)
   }, [loadingMore, laterOffset, league])
 
-  return { matches, loading, loadingMore, error, loadEarlier, loadLater }
+  return { matches, loading, loadingMore, error, hasEarlier, hasLater, loadEarlier, loadLater }
 }

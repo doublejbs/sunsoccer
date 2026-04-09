@@ -33,7 +33,7 @@ interface DateGroup {
 
 export function MatchesPage() {
   const [league, setLeague] = useState<LeagueKey>('epl')
-  const { matches, loading, loadingMore, error, loadEarlier, loadLater } = useMatches(league)
+  const { matches, loading, loadingMore, error, hasEarlier, hasLater, loadEarlier, loadLater } = useMatches(league)
   const todayRef = useRef<HTMLDivElement>(null)
   const scrolledRef = useRef(false)
 
@@ -92,15 +92,17 @@ export function MatchesPage() {
         {!loading && !error && groups.length > 0 && (
           <>
             {/* Load earlier button */}
-            <div className="text-center mb-4">
-              <button
-                onClick={loadEarlier}
-                disabled={loadingMore}
-                className="text-xs text-gray-500 border border-gray-200 px-5 py-2 rounded-lg hover:border-gray-300 disabled:opacity-40 transition-colors"
-              >
-                {loadingMore ? '불러오는 중...' : '← 이전 경기 더보기'}
-              </button>
-            </div>
+            {hasEarlier && (
+              <div className="text-center mb-4">
+                <button
+                  onClick={loadEarlier}
+                  disabled={loadingMore}
+                  className="text-xs text-gray-500 border border-gray-200 px-5 py-2 rounded-lg hover:border-gray-300 disabled:opacity-40 transition-colors"
+                >
+                  {loadingMore ? '불러오는 중...' : '← 이전 경기 더보기'}
+                </button>
+              </div>
+            )}
 
             <div className="relative">
               {/* Timeline line */}
@@ -158,15 +160,17 @@ export function MatchesPage() {
             </div>
 
             {/* Load later button */}
-            <div className="text-center mt-2 mb-4">
-              <button
-                onClick={loadLater}
-                disabled={loadingMore}
-                className="text-xs text-gray-500 border border-gray-200 px-5 py-2 rounded-lg hover:border-gray-300 disabled:opacity-40 transition-colors"
-              >
-                {loadingMore ? '불러오는 중...' : '다음 경기 더보기 →'}
-              </button>
-            </div>
+            {hasLater && (
+              <div className="text-center mt-2 mb-4">
+                <button
+                  onClick={loadLater}
+                  disabled={loadingMore}
+                  className="text-xs text-gray-500 border border-gray-200 px-5 py-2 rounded-lg hover:border-gray-300 disabled:opacity-40 transition-colors"
+                >
+                  {loadingMore ? '불러오는 중...' : '다음 경기 더보기 →'}
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>
