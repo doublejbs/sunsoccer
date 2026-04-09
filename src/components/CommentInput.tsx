@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../hooks/useAuth'
+import { LoginPrompt } from './LoginPrompt'
 
 interface CommentInputProps {
   articleId: string
@@ -9,17 +11,20 @@ interface CommentInputProps {
 }
 
 export function CommentInput({ articleId, parentId, onSubmitted, placeholder = '댓글을 입력해주세요...' }: CommentInputProps) {
+  const { user } = useAuth()
   const [content, setContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
+  if (!user) {
+    return <LoginPrompt message="댓글을 작성하려면 로그인이 필요합니다." />
+  }
+
   async function handleSubmit() {
     if (!content.trim() || submitting) return
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { alert('로그인이 필요합니다.'); return }
 
     setSubmitting(true)
     const { error } = await supabase.from('comments').insert({
-      article_id: articleId, user_id: user.id, parent_id: parentId ?? null, content: content.trim(),
+      article_id: articleId, user_id: user!.id, parent_id: parentId ?? null, content: content.trim(),
     })
     if (error) alert('댓글 작성에 실패했습니다.')
     else { setContent(''); onSubmitted() }
