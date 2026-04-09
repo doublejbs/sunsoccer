@@ -26,7 +26,7 @@ function FeaturedCard({ article, priority }: { article: Article; priority?: bool
   return (
     <Link
       to={`/news/${article.id}`}
-      className="group relative block rounded-xl overflow-hidden bg-[#111]"
+      className="group relative block rounded-xl overflow-hidden bg-[#141414]"
     >
       {/* Image */}
       {article.image_url ? (
@@ -37,7 +37,7 @@ function FeaturedCard({ article, priority }: { article: Article; priority?: bool
           className="w-full h-48 lg:h-56 object-cover opacity-80 group-hover:opacity-60 group-hover:scale-105 transition-all duration-500"
         />
       ) : (
-        <div className="w-full h-48 lg:h-56 bg-gradient-to-br from-gray-800 to-gray-900" />
+        <div className="w-full h-48 lg:h-56 bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a]" />
       )}
 
       {/* Gradient overlay */}

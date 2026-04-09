@@ -17,20 +17,20 @@ export function ReplyList({ replies, articleId, parentId, onRefresh }: ReplyList
   return (
     <div className="mt-3 ml-6 space-y-0">
       {replies.map((reply) => (
-        <div key={reply.id} className="py-3 px-3 bg-white rounded-lg border border-gray-100 mb-2">
+        <div key={reply.id} className="py-3 px-3 bg-[#1a1a1a] rounded-lg border border-[#333] mb-2">
           <div className="flex items-center gap-1.5 mb-1.5">
-            <span className="text-sm font-semibold text-[#111]">{reply.profiles?.nickname ?? '알 수 없음'}</span>
-            <span className="text-xs text-gray-400">·</span>
-            <span className="text-xs text-gray-400"><TimeAgo date={reply.created_at} /></span>
+            <span className="text-sm font-semibold text-[#f0f0f0]">{reply.profiles?.nickname ?? '알 수 없음'}</span>
+            <span className="text-xs text-gray-500">·</span>
+            <span className="text-xs text-gray-500"><TimeAgo date={reply.created_at} /></span>
           </div>
-          <p className="text-sm text-gray-700 leading-relaxed mb-2">
+          <p className="text-sm text-gray-300 leading-relaxed mb-2">
             {renderMention(reply.content)}
           </p>
           <div className="flex items-center gap-4">
             <VoteButtons commentId={reply.id} likes={reply.likes} dislikes={reply.dislikes} onVoted={onRefresh} />
             <button
               onClick={() => setReplyTo(replyTo === reply.id ? null : reply.id)}
-              className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
             >
               답글
             </button>

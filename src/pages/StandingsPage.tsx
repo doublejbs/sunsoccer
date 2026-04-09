@@ -19,15 +19,15 @@ export function StandingsPage() {
           <LeagueTabs selected={league} onSelect={setLeague} />
         </div>
 
-        <h1 className="text-lg font-bold text-[#111] mb-4">순위표</h1>
+        <h1 className="text-lg font-bold text-[#f0f0f0] mb-4">순위표</h1>
 
-        {loading && <div className="py-8 text-center text-gray-400 text-sm">순위표를 불러오는 중...</div>}
-        {error && <div className="py-8 text-center text-red-500 text-sm">오류: {error}</div>}
+        {loading && <div className="py-8 text-center text-gray-500 text-sm">순위표를 불러오는 중...</div>}
+        {error && <div className="py-8 text-center text-red-400 text-sm">오류: {error}</div>}
 
         {!loading && !error && standings.length > 0 && (
-          <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
+          <div className="bg-[#141414] rounded-lg border border-[#222] overflow-hidden">
             {/* Header */}
-            <div className="flex items-center py-2 px-3 bg-gray-50 text-xs font-semibold text-gray-500 border-b border-gray-100">
+            <div className="flex items-center py-2 px-3 bg-[#141414] text-xs font-semibold text-gray-400 border-b border-[#222]">
               <span className="w-8 text-center">#</span>
               <span className="flex-1 pl-2">팀</span>
               <span className="w-8 text-center">경기</span>
@@ -46,13 +46,13 @@ export function StandingsPage() {
               return (
                 <div
                   key={row.team.id}
-                  className={`flex items-center py-2.5 px-3 border-b border-gray-50 last:border-b-0 text-sm ${
-                    isChampionsLeague ? 'border-l-2 border-l-blue-400' :
-                    isRelegation ? 'border-l-2 border-l-red-400' : ''
+                  className={`flex items-center py-2.5 px-3 border-b border-[#1a1a1a] last:border-b-0 text-sm ${
+                    isChampionsLeague ? 'border-l-2 border-l-blue-500' :
+                    isRelegation ? 'border-l-2 border-l-red-500' : ''
                   }`}
                 >
                   <span className={`w-8 text-center text-xs font-semibold ${
-                    isChampionsLeague ? 'text-blue-500' : isRelegation ? 'text-red-500' : 'text-gray-400'
+                    isChampionsLeague ? 'text-blue-400' : isRelegation ? 'text-red-400' : 'text-gray-500'
                   }`}>
                     {row.position}
                   </span>
@@ -60,16 +60,16 @@ export function StandingsPage() {
                     {row.team.crest && (
                       <img src={row.team.crest} alt="" className="w-5 h-5 object-contain flex-shrink-0" />
                     )}
-                    <span className="text-[#111] truncate text-sm">{row.team.shortName}</span>
+                    <span className="text-[#f0f0f0] truncate text-sm">{row.team.shortName}</span>
                   </div>
-                  <span className="w-8 text-center text-gray-500 text-xs">{row.playedGames}</span>
-                  <span className="w-8 text-center text-gray-500 text-xs">{row.won}</span>
-                  <span className="w-8 text-center text-gray-500 text-xs">{row.draw}</span>
-                  <span className="w-8 text-center text-gray-500 text-xs">{row.lost}</span>
-                  <span className="w-10 text-center text-gray-500 text-xs hidden lg:block">
+                  <span className="w-8 text-center text-gray-400 text-xs">{row.playedGames}</span>
+                  <span className="w-8 text-center text-gray-400 text-xs">{row.won}</span>
+                  <span className="w-8 text-center text-gray-400 text-xs">{row.draw}</span>
+                  <span className="w-8 text-center text-gray-400 text-xs">{row.lost}</span>
+                  <span className="w-10 text-center text-gray-400 text-xs hidden lg:block">
                     {row.goalDifference > 0 ? '+' : ''}{row.goalDifference}
                   </span>
-                  <span className="w-10 text-center font-bold text-[#111] text-sm">{row.points}</span>
+                  <span className="w-10 text-center font-bold text-[#f0f0f0] text-sm">{row.points}</span>
                 </div>
               )
             })}

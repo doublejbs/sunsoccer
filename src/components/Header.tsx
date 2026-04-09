@@ -20,16 +20,17 @@ export function Header() {
   }
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+    <header className="bg-[#0a0a0a] border-b border-[#222] sticky top-0 z-10">
       <div className="max-w-[960px] mx-auto flex items-center justify-between px-4 h-14">
         <div className="flex items-center gap-4">
-          <Link to="/" className="text-lg font-bold text-[#111]">
-            SunSoccer
+          <Link to="/" className="flex items-center gap-1">
+            <span className="bg-[#e30613] text-white font-headline font-bold text-lg px-2 py-0.5 leading-none tracking-tight">SUN</span>
+            <span className="text-white font-headline font-bold text-lg tracking-tight">CHOOK</span>
           </Link>
-          <Link to="/matches" className="text-sm text-gray-500 hover:text-gray-900">
+          <Link to="/matches" className="text-sm text-gray-400 hover:text-white">
             경기일정
           </Link>
-          <Link to="/standings" className="text-sm text-gray-500 hover:text-gray-900">
+          <Link to="/standings" className="text-sm text-gray-400 hover:text-white">
             순위
           </Link>
         </div>
@@ -40,22 +41,22 @@ export function Header() {
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             onKeyDown={handleSearchKeyDown}
-            className="hidden lg:block border border-gray-200 rounded-lg px-4 py-2 text-sm w-48 outline-none focus:border-gray-400"
+            className="hidden lg:block bg-[#141414] border border-[#333] text-white placeholder-gray-500 rounded-lg px-4 py-2 text-sm w-48 outline-none focus:border-gray-500"
           />
           {user ? (
             <div className="flex items-center gap-3">
-              <Link to="/mypage" className="text-sm text-gray-700 hover:text-gray-900">
+              <Link to="/mypage" className="text-sm text-gray-300 hover:text-white">
                 {profile?.nickname ?? user.email}
               </Link>
               <button
                 onClick={signOut}
-                className="text-sm text-gray-500 hover:text-gray-700"
+                className="text-sm text-gray-500 hover:text-gray-300"
               >
                 로그아웃
               </button>
             </div>
           ) : (
-            <Link to="/login" className="text-sm text-gray-500 hover:text-gray-700">
+            <Link to="/login" className="text-sm text-gray-400 hover:text-white">
               로그인
             </Link>
           )}

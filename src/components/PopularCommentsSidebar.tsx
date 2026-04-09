@@ -28,21 +28,21 @@ export function PopularCommentsSidebar() {
   }, [])
 
   return (
-    <div className="bg-gray-50 rounded-lg p-4">
-      <h3 className="font-semibold text-sm text-[#111] mb-3">🔥 인기 댓글</h3>
+    <div className="bg-[#141414] rounded-lg p-4">
+      <h3 className="font-semibold text-sm text-[#f0f0f0] mb-3">🔥 인기 댓글</h3>
       {comments.length === 0 ? (
-        <p className="text-xs text-gray-400">아직 인기 댓글이 없습니다.</p>
+        <p className="text-xs text-gray-500">아직 인기 댓글이 없습니다.</p>
       ) : (
         <ul className="space-y-3">
           {comments.map((c) => (
-            <li key={c.id} className="pb-3 border-b border-gray-200 last:border-b-0">
-              <Link to={`/news/${c.article_id}`} className="block hover:bg-gray-100 -mx-1 px-1 rounded transition-colors">
-                <p className="text-xs text-gray-700 leading-relaxed">
+            <li key={c.id} className="pb-3 border-b border-[#333] last:border-b-0">
+              <Link to={`/news/${c.article_id}`} className="block hover:bg-[#1a1a1a] -mx-1 px-1 rounded transition-colors">
+                <p className="text-xs text-gray-300 leading-relaxed">
                   "{c.content.length > 40 ? c.content.slice(0, 40) + '...' : c.content}"
                 </p>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-gray-400">{c.profiles?.nickname}</span>
-                  <span className="text-xs text-gray-400">👍 {c.likes}</span>
+                  <span className="text-xs text-gray-500">{c.profiles?.nickname}</span>
+                  <span className="text-xs text-gray-500">👍 {c.likes}</span>
                 </div>
               </Link>
             </li>

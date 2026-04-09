@@ -14,17 +14,17 @@ export function CommentItem({ comment, onRefresh }: CommentItemProps) {
   const isBest = comment.likes >= BEST_COMMENT_THRESHOLD
 
   return (
-    <div className={`py-4 px-4 lg:px-5 border-b border-gray-100 ${isBest ? 'bg-gray-50' : ''}`}>
+    <div className={`py-4 px-4 lg:px-5 border-b border-[#222] ${isBest ? 'bg-[#141414]' : ''}`}>
       <div className="flex items-center gap-1.5 mb-2">
         <BestBadge likes={comment.likes} />
-        <span className="text-sm font-semibold text-[#111]">{comment.profiles?.nickname ?? '알 수 없음'}</span>
-        <span className="text-xs text-gray-400">·</span>
-        <span className="text-xs text-gray-400"><TimeAgo date={comment.created_at} /></span>
+        <span className="text-sm font-semibold text-[#f0f0f0]">{comment.profiles?.nickname ?? '알 수 없음'}</span>
+        <span className="text-xs text-gray-500">·</span>
+        <span className="text-xs text-gray-500"><TimeAgo date={comment.created_at} /></span>
       </div>
-      <p className="text-sm text-gray-700 leading-relaxed mb-2.5">{comment.content}</p>
+      <p className="text-sm text-gray-300 leading-relaxed mb-2.5">{comment.content}</p>
       <div className="flex items-center gap-4">
         <VoteButtons commentId={comment.id} likes={comment.likes} dislikes={comment.dislikes} onVoted={onRefresh} />
-        <button onClick={() => setShowReplyInput(!showReplyInput)} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+        <button onClick={() => setShowReplyInput(!showReplyInput)} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">
           답글 {comment.replies && comment.replies.length > 0 ? comment.replies.length : ''}
         </button>
       </div>

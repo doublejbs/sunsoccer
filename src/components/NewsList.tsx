@@ -33,7 +33,7 @@ export function NewsList({ articles, loading, error, hasMore, onLoadMore }: News
 
   if (loading && articles.length === 0) {
     return (
-      <div className="py-8 text-center text-gray-400 text-sm">
+      <div className="py-8 text-center text-gray-500 text-sm">
         뉴스를 불러오는 중...
       </div>
     )
@@ -41,7 +41,7 @@ export function NewsList({ articles, loading, error, hasMore, onLoadMore }: News
 
   if (error) {
     return (
-      <div className="py-8 text-center text-red-500 text-sm">
+      <div className="py-8 text-center text-red-400 text-sm">
         오류가 발생했습니다: {error}
       </div>
     )
@@ -49,7 +49,7 @@ export function NewsList({ articles, loading, error, hasMore, onLoadMore }: News
 
   if (articles.length === 0) {
     return (
-      <div className="py-8 text-center text-gray-400 text-sm">
+      <div className="py-8 text-center text-gray-500 text-sm">
         뉴스가 없습니다.
       </div>
     )
@@ -75,7 +75,7 @@ export function NewsList({ articles, loading, error, hasMore, onLoadMore }: News
 
       {/* Infinite scroll sentinel */}
       {hasMore && (
-        <div ref={sentinelRef} className="py-6 text-center text-gray-400 text-sm">
+        <div ref={sentinelRef} className="py-6 text-center text-gray-500 text-sm">
           {loading ? '불러오는 중...' : ''}
         </div>
       )}
