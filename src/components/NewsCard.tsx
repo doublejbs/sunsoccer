@@ -13,7 +13,7 @@ export function NewsCard({ article }: NewsCardProps) {
         <img src={article.image_url} alt="" className="w-full h-40 object-cover" />
       )}
       <div className="p-3">
-        <span className="inline-block bg-[#111] text-white text-[10px] font-bold px-1.5 py-0.5 uppercase tracking-wide mb-2">{article.source}</span>
+        <span className="text-[11px] text-gray-400 mb-1 block">{article.source}</span>
         <h3 className="font-headline font-bold text-[#111] leading-snug mb-1.5 line-clamp-3 text-sm lg:text-base">
           {article.title}
         </h3>
