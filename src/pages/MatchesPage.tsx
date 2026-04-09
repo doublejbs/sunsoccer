@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { LeagueTabs } from '../components/LeagueTabs'
-import { useMatches, getDateRange } from '../hooks/useMatches'
+import { useMatches } from '../hooks/useMatches'
 import type { LeagueKey } from '../lib/constants'
 import type { Match } from '../lib/types'
 
@@ -19,7 +19,7 @@ function formatDateLabel(dateKey: string) {
 
   const label = d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })
 
-  if (dateKey === todayKey) return { label: `오늘`, sub: label, isToday: true }
+  if (dateKey === todayKey) return { label: '오늘', sub: label, isToday: true }
   if (dateKey === yesterday.toISOString().split('T')[0]) return { label: '어제', sub: label, isToday: false }
   if (dateKey === tomorrow.toISOString().split('T')[0]) return { label: '내일', sub: label, isToday: false }
   return { label, sub: '', isToday: false }
@@ -33,9 +33,7 @@ interface DateGroup {
 
 export function MatchesPage() {
   const [league, setLeague] = useState<LeagueKey>('epl')
-  const [offset, setOffset] = useState(0)
-  const { from, to } = getDateRange(offset)
-  const { matches, loading, error } = useMatches(league, from, to)
+  const { matches, loading, loadingMore, error, loadEarlier, loadLater } = useMatches(league)
   const todayRef = useRef<HTMLDivElement>(null)
   const scrolledRef = useRef(false)
 
@@ -68,19 +66,9 @@ export function MatchesPage() {
     }
   }, [loading, groups.length])
 
-  // Reset scroll flag on league/offset change
   useEffect(() => {
     scrolledRef.current = false
-  }, [league, offset])
-
-  const goEarlier = useCallback(() => setOffset(o => o - 30), [])
-  const goLater = useCallback(() => setOffset(o => o + 30), [])
-  const goToday = useCallback(() => {
-    setOffset(0)
-    setTimeout(() => {
-      todayRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }, 500)
-  }, [])
+  }, [league])
 
   return (
     <div>
@@ -92,25 +80,7 @@ export function MatchesPage() {
           <LeagueTabs selected={league} onSelect={setLeague} />
         </div>
 
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-lg font-bold text-[#111]">경기 일정</h1>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={goEarlier}
-              disabled={loading}
-              className="text-xs text-gray-500 border border-gray-200 px-3 py-1.5 rounded-lg hover:border-gray-300 disabled:opacity-40 transition-colors"
-            >
-              ← 이전
-            </button>
-            <button
-              onClick={goLater}
-              disabled={loading}
-              className="text-xs text-gray-500 border border-gray-200 px-3 py-1.5 rounded-lg hover:border-gray-300 disabled:opacity-40 transition-colors"
-            >
-              다음 →
-            </button>
-          </div>
-        </div>
+        <h1 className="text-lg font-bold text-[#111] mb-4">경기 일정</h1>
 
         {loading && <div className="py-8 text-center text-gray-400 text-sm">경기 일정을 불러오는 중...</div>}
         {error && <div className="py-8 text-center text-red-500 text-sm">오류: {error}</div>}
@@ -120,67 +90,91 @@ export function MatchesPage() {
         )}
 
         {!loading && !error && groups.length > 0 && (
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute left-[7px] lg:left-[9px] top-0 bottom-0 w-px bg-gray-200" />
+          <>
+            {/* Load earlier button */}
+            <div className="text-center mb-4">
+              <button
+                onClick={loadEarlier}
+                disabled={loadingMore}
+                className="text-xs text-gray-500 border border-gray-200 px-5 py-2 rounded-lg hover:border-gray-300 disabled:opacity-40 transition-colors"
+              >
+                {loadingMore ? '불러오는 중...' : '← 이전 경기 더보기'}
+              </button>
+            </div>
 
-            {groups.map((group, idx) => {
-              const { label, sub, isToday } = formatDateLabel(group.dateKey)
-              const isTodayOrTarget = idx === todayIndex
-              const isPast = idx < (todayIndex === -1 ? groups.length : todayIndex)
+            <div className="relative">
+              {/* Timeline line */}
+              <div className="absolute left-[7px] lg:left-[9px] top-0 bottom-0 w-px bg-gray-200" />
 
-              return (
-                <div
-                  key={group.dateKey}
-                  ref={isTodayOrTarget ? todayRef : undefined}
-                  className="relative pl-7 lg:pl-8 pb-5"
-                >
-                  {/* Timeline dot */}
-                  <div className={`absolute left-0 top-1 w-[15px] h-[15px] lg:w-[19px] lg:h-[19px] rounded-full border-2 ${
-                    isToday
-                      ? 'bg-[#111] border-[#111] ring-4 ring-gray-200'
-                      : isPast
-                        ? 'bg-gray-300 border-gray-300'
-                        : 'bg-white border-gray-300'
-                  }`} />
+              {groups.map((group, idx) => {
+                const { label, sub, isToday } = formatDateLabel(group.dateKey)
+                const isTodayOrTarget = idx === todayIndex
+                const isPast = idx < (todayIndex === -1 ? groups.length : todayIndex)
 
-                  {/* Date header */}
-                  <div className="flex items-baseline gap-2 mb-2">
-                    <span className={`text-sm font-bold ${isToday ? 'text-[#111]' : isPast ? 'text-gray-400' : 'text-[#111]'}`}>
-                      {label}
-                    </span>
-                    {sub && <span className="text-xs text-gray-400">{sub}</span>}
-                    <span className="text-[11px] text-gray-300 ml-auto">R{group.matchday}</span>
+                return (
+                  <div
+                    key={group.dateKey}
+                    ref={isTodayOrTarget ? todayRef : undefined}
+                    className="relative pl-7 lg:pl-8 pb-5"
+                  >
+                    {/* Timeline dot */}
+                    <div className={`absolute left-0 top-1 w-[15px] h-[15px] lg:w-[19px] lg:h-[19px] rounded-full border-2 ${
+                      isToday
+                        ? 'bg-[#111] border-[#111] ring-4 ring-gray-200'
+                        : isPast
+                          ? 'bg-gray-300 border-gray-300'
+                          : 'bg-white border-gray-300'
+                    }`} />
+
+                    {/* Date header */}
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className={`text-sm font-bold ${isToday ? 'text-[#111]' : isPast ? 'text-gray-400' : 'text-[#111]'}`}>
+                        {label}
+                      </span>
+                      {sub && <span className="text-xs text-gray-400">{sub}</span>}
+                      <span className="text-[11px] text-gray-300 ml-auto">R{group.matchday}</span>
+                    </div>
+
+                    {/* Match cards */}
+                    <div className={`rounded-xl border overflow-hidden ${
+                      isToday
+                        ? 'bg-white border-gray-200 shadow-sm'
+                        : isPast
+                          ? 'bg-gray-50/70 border-gray-100'
+                          : 'bg-white border-gray-100'
+                    }`}>
+                      {group.matches.map((match, i) => (
+                        <MatchRow
+                          key={match.id}
+                          match={match}
+                          dimmed={isPast}
+                          showBorder={i < group.matches.length - 1}
+                        />
+                      ))}
+                    </div>
                   </div>
+                )
+              })}
+            </div>
 
-                  {/* Match cards */}
-                  <div className={`rounded-xl border overflow-hidden ${
-                    isToday
-                      ? 'bg-white border-gray-200 shadow-sm'
-                      : isPast
-                        ? 'bg-gray-50/70 border-gray-100'
-                        : 'bg-white border-gray-100'
-                  }`}>
-                    {group.matches.map((match, i) => (
-                      <MatchRow
-                        key={match.id}
-                        match={match}
-                        dimmed={isPast}
-                        showBorder={i < group.matches.length - 1}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+            {/* Load later button */}
+            <div className="text-center mt-2 mb-4">
+              <button
+                onClick={loadLater}
+                disabled={loadingMore}
+                className="text-xs text-gray-500 border border-gray-200 px-5 py-2 rounded-lg hover:border-gray-300 disabled:opacity-40 transition-colors"
+              >
+                {loadingMore ? '불러오는 중...' : '다음 경기 더보기 →'}
+              </button>
+            </div>
+          </>
         )}
       </div>
 
-      {/* Scroll to today button */}
+      {/* Scroll to today floating button */}
       {!loading && groups.length > 0 && (
         <button
-          onClick={goToday}
+          onClick={() => todayRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
           className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#111] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg hover:bg-gray-800 transition-colors z-20"
         >
           오늘 경기 보기
