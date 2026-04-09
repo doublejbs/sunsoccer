@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { LeagueTabs } from '../components/LeagueTabs'
-import { useMatches } from '../hooks/useMatches'
+import { useMatches, getDateRange } from '../hooks/useMatches'
 import type { LeagueKey } from '../lib/constants'
 import type { Match } from '../lib/types'
 
@@ -33,7 +33,9 @@ interface DateGroup {
 
 export function MatchesPage() {
   const [league, setLeague] = useState<LeagueKey>('epl')
-  const { matches, loading, error } = useMatches(league)
+  const [offset, setOffset] = useState(0)
+  const { from, to } = getDateRange(offset)
+  const { matches, loading, error } = useMatches(league, from, to)
   const todayRef = useRef<HTMLDivElement>(null)
   const scrolledRef = useRef(false)
 
@@ -66,10 +68,19 @@ export function MatchesPage() {
     }
   }, [loading, groups.length])
 
-  // Reset scroll flag on league change
+  // Reset scroll flag on league/offset change
   useEffect(() => {
     scrolledRef.current = false
-  }, [league])
+  }, [league, offset])
+
+  const goEarlier = useCallback(() => setOffset(o => o - 30), [])
+  const goLater = useCallback(() => setOffset(o => o + 30), [])
+  const goToday = useCallback(() => {
+    setOffset(0)
+    setTimeout(() => {
+      todayRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 500)
+  }, [])
 
   return (
     <div>
@@ -81,7 +92,25 @@ export function MatchesPage() {
           <LeagueTabs selected={league} onSelect={setLeague} />
         </div>
 
-        <h1 className="text-lg font-bold text-[#111] mb-4">경기 일정</h1>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-lg font-bold text-[#111]">경기 일정</h1>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={goEarlier}
+              disabled={loading}
+              className="text-xs text-gray-500 border border-gray-200 px-3 py-1.5 rounded-lg hover:border-gray-300 disabled:opacity-40 transition-colors"
+            >
+              ← 이전
+            </button>
+            <button
+              onClick={goLater}
+              disabled={loading}
+              className="text-xs text-gray-500 border border-gray-200 px-3 py-1.5 rounded-lg hover:border-gray-300 disabled:opacity-40 transition-colors"
+            >
+              다음 →
+            </button>
+          </div>
+        </div>
 
         {loading && <div className="py-8 text-center text-gray-400 text-sm">경기 일정을 불러오는 중...</div>}
         {error && <div className="py-8 text-center text-red-500 text-sm">오류: {error}</div>}
@@ -151,7 +180,7 @@ export function MatchesPage() {
       {/* Scroll to today button */}
       {!loading && groups.length > 0 && (
         <button
-          onClick={() => todayRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+          onClick={goToday}
           className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#111] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg hover:bg-gray-800 transition-colors z-20"
         >
           오늘 경기 보기

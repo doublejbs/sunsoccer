@@ -38,14 +38,22 @@ serve(async (req) => {
   if (type === 'standings') {
     endpoint = `${BASE_URL}/competitions/${competitionCode}/standings`
   } else {
-    // Get matches ±30 days from today
-    const today = new Date()
-    const from = new Date(today)
-    from.setDate(today.getDate() - 30)
-    const to = new Date(today)
-    to.setDate(today.getDate() + 30)
-    const fromStr = from.toISOString().split('T')[0]
-    const toStr = to.toISOString().split('T')[0]
+    // Use client-specified date range, default ±30 days from today
+    const fromParam = url.searchParams.get('from')
+    const toParam = url.searchParams.get('to')
+    let fromStr: string, toStr: string
+    if (fromParam && toParam) {
+      fromStr = fromParam
+      toStr = toParam
+    } else {
+      const today = new Date()
+      const from = new Date(today)
+      from.setDate(today.getDate() - 30)
+      const to = new Date(today)
+      to.setDate(today.getDate() + 30)
+      fromStr = from.toISOString().split('T')[0]
+      toStr = to.toISOString().split('T')[0]
+    }
     endpoint = `${BASE_URL}/competitions/${competitionCode}/matches?dateFrom=${fromStr}&dateTo=${toStr}`
   }
 
