@@ -10,6 +10,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>
   signInWithKakao: () => Promise<void>
   signOut: () => Promise<void>
+  updateNickname: (nickname: string) => Promise<{ error: string | null }>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -61,8 +62,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null)
   }
 
+  async function updateNickname(nickname: string): Promise<{ error: string | null }> {
+    if (!user) return { error: '로그인이 필요합니다.' }
+    const trimmed = nickname.trim()
+    if (!trimmed || trimmed.length < 2) return { error: '닉네임은 2자 이상이어야 합니다.' }
+    if (trimmed.length > 20) return { error: '닉네임은 20자 이하여야 합니다.' }
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ nickname: trimmed })
+      .eq('id', user.id)
+
+    if (error) {
+      if (error.code === '23505') return { error: '이미 사용 중인 닉네임입니다.' }
+      return { error: '닉네임 변경에 실패했습니다.' }
+    }
+
+    setProfile(prev => prev ? { ...prev, nickname: trimmed } : prev)
+    return { error: null }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signInWithGoogle, signInWithKakao, signOut }}>
+    <AuthContext.Provider value={{ user, profile, loading, signInWithGoogle, signInWithKakao, signOut, updateNickname }}>
       {children}
     </AuthContext.Provider>
   )

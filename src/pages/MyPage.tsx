@@ -6,10 +6,14 @@ import { TimeAgo } from '../components/TimeAgo'
 import type { Comment } from '../lib/types'
 
 export function MyPage() {
-  const { user, profile, loading: authLoading } = useAuth()
+  const { user, profile, loading: authLoading, updateNickname } = useAuth()
   const navigate = useNavigate()
   const [comments, setComments] = useState<(Comment & { articles?: { id: string; title: string } })[]>([])
   const [loading, setLoading] = useState(true)
+  const [editing, setEditing] = useState(false)
+  const [nicknameInput, setNicknameInput] = useState('')
+  const [nicknameError, setNicknameError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (!authLoading && !user) navigate('/login')
@@ -35,8 +39,49 @@ export function MyPage() {
   return (
     <div className="px-4 lg:px-0 py-6">
       <div className="mb-6">
-        <h1 className="text-lg font-bold text-[#111] mb-1">마이페이지</h1>
-        <p className="text-sm text-gray-500">닉네임: {profile?.nickname ?? '설정 필요'}</p>
+        <h1 className="text-lg font-bold text-[#111] mb-3">마이페이지</h1>
+        {editing ? (
+          <div className="flex items-center gap-2">
+            <input
+              value={nicknameInput}
+              onChange={(e) => { setNicknameInput(e.target.value); setNicknameError(null) }}
+              maxLength={20}
+              className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-gray-400 w-48"
+              placeholder="새 닉네임"
+              autoFocus
+            />
+            <button
+              onClick={async () => {
+                setSaving(true)
+                const { error } = await updateNickname(nicknameInput)
+                if (error) setNicknameError(error)
+                else setEditing(false)
+                setSaving(false)
+              }}
+              disabled={saving}
+              className="text-xs bg-[#111] text-white px-3 py-1.5 rounded-lg disabled:opacity-40"
+            >
+              {saving ? '저장 중...' : '저장'}
+            </button>
+            <button
+              onClick={() => { setEditing(false); setNicknameError(null) }}
+              className="text-xs text-gray-400 hover:text-gray-600"
+            >
+              취소
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-700">{profile?.nickname ?? '설정 필요'}</span>
+            <button
+              onClick={() => { setNicknameInput(profile?.nickname ?? ''); setEditing(true) }}
+              className="text-xs text-[#3b82f6] hover:underline"
+            >
+              수정
+            </button>
+          </div>
+        )}
+        {nicknameError && <p className="text-xs text-red-500 mt-1">{nicknameError}</p>}
       </div>
 
       <h2 className="text-sm font-semibold text-[#111] mb-3">내 댓글</h2>
