@@ -35,6 +35,47 @@ async function fetchNaverNews(query: string): Promise<NaverNewsItem[]> {
   return data.items ?? []
 }
 
+interface GoogleNewsItem {
+  title: string
+  link: string
+  pubDate: string
+  sourceName: string
+}
+
+async function fetchGoogleNews(query: string): Promise<GoogleNewsItem[]> {
+  const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ko&gl=KR&ceid=KR:ko`
+  try {
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } })
+    if (!res.ok) { console.error(`Google News RSS error for "${query}":`, res.status); return [] }
+    const xml = await res.text()
+    const items: GoogleNewsItem[] = []
+    const itemRegex = /<item>([\s\S]*?)<\/item>/g
+    let match
+    while ((match = itemRegex.exec(xml)) !== null) {
+      const block = match[1]
+      const rawTitle = block.match(/<title>([\s\S]*?)<\/title>/)?.[1]?.trim() ?? ''
+      const linkMatch = block.match(/<link>([\s\S]*?)<\/link>/) || block.match(/<link\s*\/>\s*(https?:\/\/[^\s<]+)/)
+      const link = linkMatch?.[1]?.trim() ?? ''
+      const pubDate = block.match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1]?.trim() ?? ''
+      const sourceUrl = block.match(/<source\s+url=["']([^"']+)["']/)?.[1] ?? ''
+      const sourceName = block.match(/<source[^>]*>([\s\S]*?)<\/source>/)?.[1]?.trim() ?? ''
+      // Strip " - SourceName" suffix from title
+      let title = stripHtmlTags(rawTitle)
+      if (sourceName && title.endsWith(` - ${sourceName}`)) {
+        title = title.slice(0, -(` - ${sourceName}`).length)
+      }
+      if (!link || !title || title === 'Google News') continue
+      // Filter out non-Korean articles
+      if (!/[가-힣]/.test(title)) continue
+      items.push({ title, link, pubDate, sourceName })
+    }
+    return items
+  } catch (err) {
+    console.error(`Google News RSS error for "${query}":`, err)
+    return []
+  }
+}
+
 function stripHtmlTags(str: string): string {
   return str
     .replace(/<[^>]*>/g, '')
@@ -62,16 +103,17 @@ function extractSource(link: string): string {
   catch { return '알 수 없음' }
 }
 
-async function extractOgMeta(url: string): Promise<{ image: string | null; title: string | null; description: string | null }> {
+async function extractOgMeta(url: string): Promise<{ finalUrl: string; image: string | null; title: string | null; description: string | null }> {
   try {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 3000)
     const res = await fetch(url, {
       signal: controller.signal,
-      headers: { 'User-Agent': 'Mozilla/5.0' }
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+      redirect: 'follow',
     })
     clearTimeout(timeout)
-    if (!res.ok) return { image: null, title: null, description: null }
+    if (!res.ok) return { finalUrl: res.url, image: null, title: null, description: null }
     const html = await res.text()
     const imageMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
       || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
@@ -81,12 +123,13 @@ async function extractOgMeta(url: string): Promise<{ image: string | null; title
       || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i)
     const decode = (s: string) => stripHtmlTags(s)
     return {
+      finalUrl: res.url,
       image: imageMatch ? imageMatch[1] : null,
       title: titleMatch ? decode(titleMatch[1]) : null,
       description: descMatch ? decode(descMatch[1]) : null,
     }
   } catch {
-    return { image: null, title: null, description: null }
+    return { finalUrl: url, image: null, title: null, description: null }
   }
 }
 
@@ -95,6 +138,7 @@ serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
     let totalInserted = 0
 
+    // Naver News API
     for (const [league, query] of Object.entries(SEARCH_QUERIES)) {
       const items = await fetchNaverNews(query)
       for (const item of items) {
@@ -113,6 +157,24 @@ serve(async (req) => {
           { onConflict: 'link', ignoreDuplicates: false }
         )
         if (!error) totalInserted++
+      }
+    }
+
+    // Google News RSS — lightweight, no URL resolution
+    for (const [league, query] of Object.entries(SEARCH_QUERIES)) {
+      const items = await fetchGoogleNews(query)
+      const rows = items.map((item) => ({
+        title: item.title,
+        description: '',
+        source: item.sourceName || 'google',
+        link: item.link,
+        league,
+        pub_date: new Date(item.pubDate).toISOString(),
+        image_url: null,
+      }))
+      if (rows.length) {
+        const { count } = await supabase.from('articles').upsert(rows, { onConflict: 'link', ignoreDuplicates: false, count: 'exact' })
+        totalInserted += count ?? 0
       }
     }
 

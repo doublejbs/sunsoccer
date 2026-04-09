@@ -1,9 +1,10 @@
 import { useState, type KeyboardEvent } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
 export function Header() {
   const { user, profile, signOut } = useAuth()
+  const { pathname } = useLocation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [searchValue, setSearchValue] = useState(searchParams.get('search') ?? '')
@@ -57,9 +58,22 @@ export function Header() {
       {/* Sub nav — white */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-[960px] mx-auto flex items-center gap-6 px-4 h-10">
-          <Link to="/" className="text-sm font-bold text-[#111] hover:text-gray-600">뉴스</Link>
-          <Link to="/matches" className="text-sm font-bold text-gray-400 hover:text-[#111]">경기일정</Link>
-          <Link to="/standings" className="text-sm font-bold text-gray-400 hover:text-[#111]">순위</Link>
+          {[
+            { to: '/', label: '뉴스' },
+            { to: '/matches', label: '경기일정' },
+            { to: '/standings', label: '순위' },
+          ].map(({ to, label }) => {
+            const active = to === '/' ? pathname === '/' : pathname.startsWith(to)
+            return (
+              <Link
+                key={to}
+                to={to}
+                className={`text-sm font-bold ${active ? 'text-[#111]' : 'text-gray-400 hover:text-[#111]'}`}
+              >
+                {label}
+              </Link>
+            )
+          })}
         </div>
       </div>
     </header>
