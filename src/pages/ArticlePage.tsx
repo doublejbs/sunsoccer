@@ -26,9 +26,21 @@ export function ArticlePage() {
           />
         )}
         <p className="text-sm text-gray-700 leading-relaxed mb-3">{article.description}</p>
-        <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-sm text-[#111] font-semibold hover:underline">
-          원문 기사 보기 →
-        </a>
+        <div className="flex items-center gap-4">
+          <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-sm text-[#111] font-semibold hover:underline">
+            원문 기사 보기 →
+          </a>
+          <button
+            onClick={() => {
+              const shareUrl = `${window.location.origin}/article/${article.id}`
+              navigator.clipboard.writeText(shareUrl)
+              alert('공유 링크가 복사되었습니다.')
+            }}
+            className="text-sm text-gray-400 hover:text-gray-600"
+          >
+            공유
+          </button>
+        </div>
       </div>
       <AdBanner slot="8401350370" className="my-4" />
       <CommentSection articleId={article.id} commentCount={article.comment_count} />
