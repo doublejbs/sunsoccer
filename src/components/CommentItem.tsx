@@ -34,7 +34,9 @@ export function CommentItem({ comment, onRefresh }: CommentItemProps) {
             onSubmitted={() => { setShowReplyInput(false); onRefresh() }} placeholder="답글을 입력해주세요..." />
         </div>
       )}
-      {comment.replies && comment.replies.length > 0 && <ReplyList replies={comment.replies} onRefresh={onRefresh} />}
+      {comment.replies && comment.replies.length > 0 && (
+        <ReplyList replies={comment.replies} articleId={comment.article_id} parentId={comment.id} onRefresh={onRefresh} />
+      )}
     </div>
   )
 }

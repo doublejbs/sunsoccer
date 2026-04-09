@@ -8,11 +8,12 @@ interface CommentInputProps {
   parentId?: string
   onSubmitted: () => void
   placeholder?: string
+  initialValue?: string
 }
 
-export function CommentInput({ articleId, parentId, onSubmitted, placeholder = '댓글을 입력해주세요...' }: CommentInputProps) {
+export function CommentInput({ articleId, parentId, onSubmitted, placeholder = '댓글을 입력해주세요...', initialValue = '' }: CommentInputProps) {
   const { user } = useAuth()
-  const [content, setContent] = useState('')
+  const [content, setContent] = useState(initialValue)
   const [submitting, setSubmitting] = useState(false)
 
   if (!user) {
