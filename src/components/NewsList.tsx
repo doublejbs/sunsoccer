@@ -64,11 +64,11 @@ export function NewsList({ articles, loading, error, hasMore, onLoadMore }: News
     <div>
       <FeaturedCards articles={featured} />
       <AdBanner slot="8401350370" className="my-3 px-4 lg:px-0" />
-      <div className="px-4 lg:px-0 grid grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="px-4 lg:px-0">
         {rest.map((article, index) => (
           <div key={article.id}>
             <NewsCard article={article} />
-            {index === 4 && <div className="col-span-2 lg:col-span-3"><AdBanner slot="8630053260" className="my-3" /></div>}
+            {index === 4 && <AdBanner slot="8630053260" className="my-3" />}
           </div>
         ))}
       </div>
