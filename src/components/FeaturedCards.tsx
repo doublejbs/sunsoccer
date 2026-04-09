@@ -12,66 +12,41 @@ export function FeaturedCards({ articles }: FeaturedCardsProps) {
   const [first, second] = articles
 
   return (
-    <div className="mb-4">
-      {/* Hero — full width, The Sun style */}
-      <Link
-        to={`/news/${first.id}`}
-        className="group relative block overflow-hidden"
-      >
-        {first.image_url ? (
-          <img
-            src={first.image_url}
-            alt=""
-            loading="eager"
-            className="w-full h-64 lg:h-[400px] object-cover group-hover:scale-105 transition-transform duration-700"
-          />
-        ) : (
-          <div className="w-full h-64 lg:h-[400px] bg-gray-800" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-5 lg:p-8">
-          <h2 className="font-bold font-bold text-white text-xl lg:text-3xl leading-tight mb-2 drop-shadow-lg line-clamp-3">
-            {first.title}
-          </h2>
-          <div className="flex items-center gap-2 text-xs text-white/70">
-            <span className="bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide">{first.source}</span>
-            <TimeAgo date={first.pub_date} />
-            <span>·</span>
-            <span>💬 {first.comment_count}</span>
-          </div>
-        </div>
-      </Link>
-
-      {/* Second article — smaller */}
-      {second && (
-        <Link
-          to={`/news/${second.id}`}
-          className="group relative block overflow-hidden mt-3 mx-4 lg:mx-0"
-        >
-          {second.image_url ? (
-            <img
-              src={second.image_url}
-              alt=""
-              loading="lazy"
-              className="w-full h-40 lg:h-52 object-cover group-hover:scale-105 transition-transform duration-700"
-            />
-          ) : (
-            <div className="w-full h-40 lg:h-52 bg-gray-700" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-4 lg:p-6">
-            <h3 className="font-bold font-bold text-white text-base lg:text-xl leading-tight mb-1.5 drop-shadow-lg line-clamp-2">
-              {second.title}
-            </h3>
-            <div className="flex items-center gap-2 text-xs text-white/70">
-              <span className="bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide">{second.source}</span>
-              <TimeAgo date={second.pub_date} />
-              <span>·</span>
-              <span>💬 {second.comment_count}</span>
-            </div>
-          </div>
-        </Link>
-      )}
+    <div className="px-4 lg:px-0 mb-4 grid grid-cols-2 gap-3">
+      <FeaturedCard article={first} />
+      {second && <FeaturedCard article={second} />}
     </div>
+  )
+}
+
+function FeaturedCard({ article }: { article: Article }) {
+  return (
+    <Link
+      to={`/news/${article.id}`}
+      className="group relative block overflow-hidden rounded-lg"
+    >
+      {article.image_url ? (
+        <img
+          src={article.image_url}
+          alt=""
+          className="w-full h-40 lg:h-56 object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+      ) : (
+        <div className="w-full h-40 lg:h-56 bg-gray-300" />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 p-3 lg:p-4">
+        <h3 className="font-bold text-white text-sm lg:text-base leading-snug mb-1 drop-shadow line-clamp-2">
+          {article.title}
+        </h3>
+        <div className="flex items-center gap-1.5 text-[10px] lg:text-xs text-white/60">
+          <span>{article.source}</span>
+          <span>·</span>
+          <TimeAgo date={article.pub_date} />
+          <span>·</span>
+          <span>💬 {article.comment_count}</span>
+        </div>
+      </div>
+    </Link>
   )
 }
