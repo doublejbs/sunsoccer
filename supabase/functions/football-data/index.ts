@@ -12,7 +12,17 @@ const LEAGUE_MAP: Record<string, string> = {
   ligue1: 'FL1',
 }
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+}
+
 serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
   const url = new URL(req.url)
   const league = url.searchParams.get('league') ?? 'epl'
   const type = url.searchParams.get('type') ?? 'matches' // 'matches' or 'standings'
@@ -20,7 +30,7 @@ serve(async (req) => {
   const competitionCode = LEAGUE_MAP[league]
   if (!competitionCode) {
     return new Response(JSON.stringify({ error: 'Invalid league' }), {
-      status: 400, headers: { 'Content-Type': 'application/json' }
+      status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
   }
 
@@ -39,21 +49,21 @@ serve(async (req) => {
 
     if (!res.ok) {
       return new Response(JSON.stringify({ error: `API error: ${res.status}` }), {
-        status: res.status, headers: { 'Content-Type': 'application/json' }
+        status: res.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       })
     }
 
     const data = await res.json()
     return new Response(JSON.stringify(data), {
       headers: {
+        ...corsHeaders,
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, max-age=300' // Cache 5 minutes
+        'Cache-Control': 'public, max-age=300'
       }
     })
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err) }), {
-      status: 500, headers: { 'Content-Type': 'application/json' }
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
   }
 })
