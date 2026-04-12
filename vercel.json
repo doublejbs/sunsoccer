@@ -6,7 +6,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(?:kakaotalk|facebookexternalhit|twitterbot|slackbot|linkedinbot|discordbot|telegrambot|whatsapp|Googlebot|bot|crawl|spider).*"
+          "value": ".*(?:kakaotalk-scrap|facebookexternalhit|Twitterbot|Slackbot|LinkedInBot|Discordbot|TelegramBot|WhatsApp|Googlebot|Yeti|Applebot|bingbot).*"
         }
       ],
       "destination": "/api/og?id=:id"
