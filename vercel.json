@@ -1,6 +1,17 @@
 {
   "rewrites": [
     {
+      "source": "/news/:id",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(?:kakaotalk|facebookexternalhit|twitterbot|slackbot|linkedinbot|discordbot|telegrambot|whatsapp|Googlebot|bot|crawl|spider).*"
+        }
+      ],
+      "destination": "/api/og?id=:id"
+    },
+    {
       "source": "/((?!api|assets|favicon|og-image).*)",
       "destination": "/index.html"
     }
