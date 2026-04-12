@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface AdBannerProps {
   slot: string
@@ -9,17 +9,34 @@ interface AdBannerProps {
 export function AdBanner({ slot, format = 'auto', className = '' }: AdBannerProps) {
   const adRef = useRef<HTMLDivElement>(null)
   const pushed = useRef(false)
+  const [hidden, setHidden] = useState(false)
 
   useEffect(() => {
     if (pushed.current) return
     try {
-      const adsbygoogle = (window as any).adsbygoogle || []
+      const adsbygoogle = (window as any).adsbygoogle
+      if (!adsbygoogle) {
+        setHidden(true)
+        return
+      }
       adsbygoogle.push({})
       pushed.current = true
     } catch {
-      // AdSense not loaded yet
+      setHidden(true)
     }
+
+    // Check if ad loaded after a delay
+    const timer = setTimeout(() => {
+      const ins = adRef.current?.querySelector('ins')
+      if (ins && ins.getAttribute('data-ad-status') === 'unfilled') {
+        setHidden(true)
+      }
+    }, 3000)
+
+    return () => clearTimeout(timer)
   }, [])
+
+  if (hidden) return null
 
   return (
     <div className={`ad-container overflow-hidden ${className}`} ref={adRef}>
