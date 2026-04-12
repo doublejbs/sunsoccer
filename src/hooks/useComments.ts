@@ -15,13 +15,19 @@ export function useComments(articleId: string) {
   const fetchComments = useCallback(async (reset: boolean = false) => {
     setLoading(true)
     const currentPage = reset ? 1 : page
-    const orderCol = sortMode === 'best' ? 'likes' : 'created_at'
-    const { data, error } = await supabase
+    let query = supabase
       .from('comments')
       .select('*, profiles(nickname, avatar_url)')
       .eq('article_id', articleId)
       .is('parent_id', null)
-      .order(orderCol, { ascending: false })
+
+    if (sortMode === 'best') {
+      query = query.order('likes', { ascending: false }).order('created_at', { ascending: false })
+    } else {
+      query = query.order('created_at', { ascending: false })
+    }
+
+    const { data, error } = await query
       .range((currentPage - 1) * COMMENTS_PER_PAGE, currentPage * COMMENTS_PER_PAGE - 1)
 
     if (!error && data) {
