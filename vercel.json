@@ -1,10 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/og/:id",
-      "destination": "/api/og?id=:id"
-    },
-    {
       "source": "/((?!api|assets|favicon|og-image).*)",
       "destination": "/index.html"
     }
