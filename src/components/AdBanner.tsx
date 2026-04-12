@@ -9,37 +9,40 @@ interface AdBannerProps {
 export function AdBanner({ slot, format = 'auto', className = '' }: AdBannerProps) {
   const adRef = useRef<HTMLDivElement>(null)
   const pushed = useRef(false)
-  const [hidden, setHidden] = useState(false)
+  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
     if (pushed.current) return
     try {
       const adsbygoogle = (window as any).adsbygoogle
-      if (!adsbygoogle) {
-        setHidden(true)
-        return
-      }
+      if (!adsbygoogle) return
       adsbygoogle.push({})
       pushed.current = true
     } catch {
-      setHidden(true)
+      return
     }
 
-    // Check if ad loaded after a delay
-    const timer = setTimeout(() => {
-      const ins = adRef.current?.querySelector('ins')
-      if (ins && ins.getAttribute('data-ad-status') === 'unfilled') {
-        setHidden(true)
+    // Poll to check if ad actually rendered with height
+    let checks = 0
+    const interval = setInterval(() => {
+      checks++
+      const container = adRef.current
+      if (container && container.offsetHeight > 0) {
+        setVisible(true)
+        clearInterval(interval)
       }
-    }, 3000)
+      if (checks >= 10) clearInterval(interval)
+    }, 500)
 
-    return () => clearTimeout(timer)
+    return () => clearInterval(interval)
   }, [])
 
-  if (hidden) return null
-
   return (
-    <div className={`ad-container overflow-hidden ${className}`} ref={adRef}>
+    <div
+      className={`ad-container overflow-hidden ${className}`}
+      ref={adRef}
+      style={{ display: visible ? 'block' : 'none' }}
+    >
       <ins
         className="adsbygoogle"
         style={{ display: 'block' }}
