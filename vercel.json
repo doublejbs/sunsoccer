@@ -1,7 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/news/:id",
+      "source": "/og/:id",
       "destination": "/api/og?id=:id"
     },
     {

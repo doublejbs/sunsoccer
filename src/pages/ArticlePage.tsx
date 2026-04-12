@@ -32,7 +32,7 @@ export function ArticlePage() {
           </a>
           <button
             onClick={() => {
-              const shareUrl = `${window.location.origin}/news/${article.id}`
+              const shareUrl = `${window.location.origin}/og/${article.id}`
               navigator.clipboard.writeText(shareUrl)
               alert('공유 링크가 복사되었습니다.')
             }}

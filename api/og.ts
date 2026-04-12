@@ -1,33 +1,15 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { readFileSync } from 'fs'
-import { join } from 'path'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || ''
 const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY || ''
 
-const BOT_PATTERNS = /kakaotalk|facebookexternalhit|twitterbot|slackbot|linkedinbot|discordbot|telegrambot|whatsapp|line-poker|Googlebot/i
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { id } = req.query
-  const ua = req.headers['user-agent'] || ''
 
-  // Not a bot → serve SPA index.html
-  if (!BOT_PATTERNS.test(ua)) {
-    try {
-      const html = readFileSync(join(process.cwd(), 'dist', 'index.html'), 'utf-8')
-      res.setHeader('Content-Type', 'text/html; charset=utf-8')
-      return res.status(200).send(html)
-    } catch {
-      return res.redirect('/')
-    }
-  }
-
-  // Bot request — no article ID, serve default OG
   if (!id || typeof id !== 'string') {
     return res.redirect('/')
   }
 
-  // Bot request — fetch article and return OG tags
   try {
     const response = await fetch(
       `${SUPABASE_URL}/rest/v1/articles?id=eq.${id}&select=title,description,image_url,source`,
@@ -43,7 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const article = data?.[0]
 
     if (!article) {
-      return res.redirect(`/`)
+      return res.redirect('/')
     }
 
     const title = article.title || 'Sun Chook'
@@ -51,6 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const image = article.image_url || 'https://sunsoccer.vercel.app/og-image.png'
     const url = `https://sunsoccer.vercel.app/news/${id}`
 
+    // OG tags for bots + meta refresh redirect for browsers
     const html = `<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -68,6 +51,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   <meta name="twitter:title" content="${escapeHtml(title)}" />
   <meta name="twitter:description" content="${escapeHtml(description)}" />
   <meta name="twitter:image" content="${escapeHtml(image)}" />
+  <meta http-equiv="refresh" content="0;url=/news/${id}" />
 </head>
 <body></body>
 </html>`
@@ -76,7 +60,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Cache-Control', 'public, max-age=3600')
     return res.status(200).send(html)
   } catch {
-    return res.redirect('/')
+    return res.redirect(`/news/${id}`)
   }
 }
 
