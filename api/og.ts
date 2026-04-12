@@ -66,5 +66,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 }
 
 function escapeHtml(str: string) {
-  return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  // First decode any existing HTML entities, then re-escape for HTML attributes
+  const decoded = str
+    .replace(/&quot;/g, '"')
+    .replace(/&#0*39;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&#(\d+);/g, (_m, c) => String.fromCharCode(Number(c)))
+  return decoded
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
 }
