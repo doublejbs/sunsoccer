@@ -12,11 +12,11 @@ export function Header() {
   function handleSearchKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       const trimmed = searchValue.trim()
-      if (trimmed) {
-        navigate(`/?search=${encodeURIComponent(trimmed)}`)
-      } else {
-        navigate('/')
-      }
+      const league = searchParams.get('league')
+      const params = new URLSearchParams()
+      if (league) params.set('league', league)
+      if (trimmed) params.set('search', trimmed)
+      navigate(`/?${params.toString()}`)
     }
   }
 
