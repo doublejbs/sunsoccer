@@ -1,15 +1,33 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || ''
 const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY || ''
 
+const BOT_PATTERNS = /kakaotalk|facebookexternalhit|twitterbot|slackbot|linkedinbot|discordbot|telegrambot|whatsapp|line-poker|Googlebot/i
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { id } = req.query
+  const ua = req.headers['user-agent'] || ''
 
+  // Not a bot → serve SPA index.html
+  if (!BOT_PATTERNS.test(ua)) {
+    try {
+      const html = readFileSync(join(process.cwd(), 'dist', 'index.html'), 'utf-8')
+      res.setHeader('Content-Type', 'text/html; charset=utf-8')
+      return res.status(200).send(html)
+    } catch {
+      return res.redirect('/')
+    }
+  }
+
+  // Bot request — no article ID, serve default OG
   if (!id || typeof id !== 'string') {
     return res.redirect('/')
   }
 
+  // Bot request — fetch article and return OG tags
   try {
     const response = await fetch(
       `${SUPABASE_URL}/rest/v1/articles?id=eq.${id}&select=title,description,image_url,source`,
@@ -25,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const article = data?.[0]
 
     if (!article) {
-      return res.redirect(`/news/${id}`)
+      return res.redirect(`/`)
     }
 
     const title = article.title || 'Sun Chook'
@@ -50,30 +68,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   <meta name="twitter:title" content="${escapeHtml(title)}" />
   <meta name="twitter:description" content="${escapeHtml(description)}" />
   <meta name="twitter:image" content="${escapeHtml(image)}" />
-  <meta http-equiv="refresh" content="0;url=/news/${id}" />
 </head>
-<body>
-  <p>Redirecting...</p>
-</body>
+<body></body>
 </html>`
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8')
     res.setHeader('Cache-Control', 'public, max-age=3600')
     return res.status(200).send(html)
   } catch {
-    return res.redirect(`/news/${id}`)
+    return res.redirect('/')
   }
 }
 
 function escapeHtml(str: string) {
-  // First decode any existing HTML entities, then re-escape for HTML attributes
   const decoded = str
     .replace(/&quot;/g, '"')
     .replace(/&#0*39;/g, "'")
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
-    .replace(/&#(\d+);/g, (_m, c) => String.fromCharCode(Number(c)))
+    .replace(/&#(\d+);/g, (_m: string, c: string) => String.fromCharCode(Number(c)))
   return decoded
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
