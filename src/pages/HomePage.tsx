@@ -21,13 +21,13 @@ export function HomePage() {
 
   return (
     <div>
-      <div className="lg:hidden">
+      <div className="sticky top-24 z-10 bg-[#f5f5f5] lg:hidden">
         <LeagueTabs selected={league} onSelect={handleLeagueSelect} />
       </div>
 
       <div className="lg:flex lg:gap-6 lg:py-4">
         <div className="flex-1">
-          <div className="hidden lg:block mb-4 px-0">
+          <div className="hidden lg:block sticky top-24 z-10 bg-[#f5f5f5] pb-3 mb-1 px-0">
             <LeagueTabs selected={league} onSelect={handleLeagueSelect} />
           </div>
           <NewsList articles={articles} loading={loading} error={error} hasMore={hasMore} onLoadMore={loadMore} />
