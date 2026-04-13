@@ -1,12 +1,35 @@
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useArticle } from '../hooks/useArticle'
+import { supabase } from '../lib/supabase'
+import type { Article } from '../lib/types'
 import { CommentSection } from '../components/CommentSection'
+import { NewsCard } from '../components/NewsCard'
 import { TimeAgo } from '../components/TimeAgo'
 import { AdBanner } from '../components/AdBanner'
+
+function useRelatedArticles(article: Article | null) {
+  const [articles, setArticles] = useState<Article[]>([])
+
+  useEffect(() => {
+    if (!article) return
+    supabase
+      .from('articles')
+      .select('*')
+      .eq('league', article.league)
+      .neq('id', article.id)
+      .order('pub_date', { ascending: false })
+      .limit(5)
+      .then(({ data }) => setArticles(data ?? []))
+  }, [article])
+
+  return articles
+}
 
 export function ArticlePage() {
   const { id } = useParams<{ id: string }>()
   const { article, loading, error } = useArticle(id)
+  const related = useRelatedArticles(article)
 
   if (loading) return <div className="p-4 text-center text-gray-500">로딩 중...</div>
   if (error || !article) return <div className="p-4 text-center text-red-400">기사를 찾을 수 없습니다.</div>
@@ -44,6 +67,12 @@ export function ArticlePage() {
       </div>
       <AdBanner slot="8401350370" className="my-4" />
       <CommentSection articleId={article.id} commentCount={article.comment_count} />
+      {related.length > 0 && (
+        <div className="mt-6">
+          <h2 className="text-base font-bold text-[#111] mb-1">추천 기사</h2>
+          {related.map((a) => <NewsCard key={a.id} article={a} />)}
+        </div>
+      )}
     </div>
   )
 }
