@@ -36,7 +36,7 @@ export function CommentInput({ articleId, parentId, onSubmitted, placeholder = '
     <div className="border border-gray-200 rounded-lg p-3">
       <textarea value={content} onChange={(e) => setContent(e.target.value)}
         placeholder={placeholder} maxLength={1000} rows={3}
-        className="w-full text-sm text-gray-700 placeholder-gray-400 resize-none outline-none bg-transparent" />
+        className="w-full text-base text-gray-700 placeholder-gray-400 resize-none outline-none bg-transparent" />
       <div className="flex justify-between items-center mt-2">
         <span className="text-xs text-gray-400">{content.length}/1000</span>
         <button onClick={handleSubmit} disabled={!content.trim() || submitting}
