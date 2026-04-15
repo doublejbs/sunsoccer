@@ -36,8 +36,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  async function fetchProfile(userId: string) {
+  async function fetchProfile(userId: string, attempt = 0) {
     const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
+    if (!data && attempt < 5) {
+      await new Promise(resolve => setTimeout(resolve, 300 * (attempt + 1)))
+      return fetchProfile(userId, attempt + 1)
+    }
     setProfile(data)
     setLoading(false)
   }
